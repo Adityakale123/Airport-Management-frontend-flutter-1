@@ -4,7 +4,6 @@ import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 import 'package:path_provider/path_provider.dart';
 import '../models/booking.dart';
-import '../models/flight.dart';
 
 class PdfService {
   // Generate Ticket PDF

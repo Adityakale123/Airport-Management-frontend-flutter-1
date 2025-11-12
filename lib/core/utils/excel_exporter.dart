@@ -13,27 +13,27 @@ class ExcelExporter {
 
     // Header Row
     sheet.appendRow([
-      'ID',
-      'PNR',
-      'Passenger',
-      'Flight',
-      'Seat',
-      'Amount',
-      'Status',
-      'Booking Date',
+      TextCellValue('ID'),
+      TextCellValue('PNR'),
+      TextCellValue('Passenger'),
+      TextCellValue('Flight'),
+      TextCellValue('Seat'),
+      TextCellValue('Amount'),
+      TextCellValue('Status'),
+      TextCellValue('Booking Date'),
     ]);
 
     // Data Rows
     for (var booking in bookings) {
       sheet.appendRow([
-        booking.id.toString(),
-        booking.pnr ?? '',
-        booking.passenger?.name ?? '',
-        booking.flight?.number ?? '',
-        booking.seatNo,
-        booking.amount.toString(),
-        booking.status,
-        booking.bookingDate.toString().split(' ')[0],
+        TextCellValue(booking.id.toString()),
+        TextCellValue(booking.pnr ?? ''),
+        TextCellValue(booking.passenger?.name ?? ''),
+        TextCellValue(booking.flight?.number ?? ''),
+        TextCellValue(booking.seatNo),
+        TextCellValue(booking.amount.toString()),
+        TextCellValue(booking.status),
+        TextCellValue(booking.bookingDate.toString().split(' ')[0]),
       ]);
     }
 
@@ -54,31 +54,31 @@ class ExcelExporter {
 
     // Header Row
     sheet.appendRow([
-      'ID',
-      'Number',
-      'Airline',
-      'Source',
-      'Destination',
-      'Departure',
-      'Arrival',
-      'Status',
-      'Price',
-      'Available Seats',
+      TextCellValue('ID'),
+      TextCellValue('Number'),
+      TextCellValue('Airline'),
+      TextCellValue('Source'),
+      TextCellValue('Destination'),
+      TextCellValue('Departure'),
+      TextCellValue('Arrival'),
+      TextCellValue('Status'),
+      TextCellValue('Price'),
+      TextCellValue('Available Seats'),
     ]);
 
     // Data Rows
     for (var flight in flights) {
       sheet.appendRow([
-        flight.id.toString(),
-        flight.number,
-        flight.airline,
-        flight.source,
-        flight.destination,
-        flight.departureTime.toString(),
-        flight.arrivalTime.toString(),
-        flight.status,
-        flight.price.toString(),
-        flight.availableSeats.toString(),
+        TextCellValue(flight.id.toString()),
+        TextCellValue(flight.number),
+        TextCellValue(flight.airline),
+        TextCellValue(flight.source),
+        TextCellValue(flight.destination),
+        TextCellValue(flight.departureTime.toString()),
+        TextCellValue(flight.arrivalTime.toString()),
+        TextCellValue(flight.status),
+        TextCellValue(flight.price.toString()),
+        TextCellValue(flight.availableSeats.toString()),
       ]);
     }
 
@@ -99,25 +99,25 @@ class ExcelExporter {
 
     // Header Row
     sheet.appendRow([
-      'ID',
-      'Booking ID',
-      'Amount',
-      'Method',
-      'Status',
-      'Transaction ID',
-      'Date',
+      TextCellValue('ID'),
+      TextCellValue('Booking ID'),
+      TextCellValue('Amount'),
+      TextCellValue('Method'),
+      TextCellValue('Status'),
+      TextCellValue('Transaction ID'),
+      TextCellValue('Date'),
     ]);
 
     // Data Rows
     for (var payment in payments) {
       sheet.appendRow([
-        payment.id.toString(),
-        payment.bookingId.toString(),
-        payment.amount.toString(),
-        payment.method,
-        payment.status,
-        payment.transactionId ?? '',
-        payment.paymentDate.toString().split(' ')[0],
+        TextCellValue(payment.id.toString()),
+        TextCellValue(payment.bookingId.toString()),
+        TextCellValue(payment.amount.toString()),
+        TextCellValue(payment.method),
+        TextCellValue(payment.status),
+        TextCellValue(payment.transactionId ?? ''),
+        TextCellValue(payment.paymentDate.toString().split(' ')[0]),
       ]);
     }
 
@@ -139,20 +139,20 @@ class ExcelExporter {
     final sheet = excel['Revenue Report'];
 
     // Summary Section
-    sheet.appendRow(['Revenue Report']);
+    sheet.appendRow([TextCellValue('Revenue Report')]);
     sheet.appendRow([]);
-    sheet.appendRow(['Total Revenue', revenueData['totalRevenue'].toString()]);
+    sheet.appendRow([TextCellValue('Total Revenue'), TextCellValue(revenueData['totalRevenue'].toString())]);
     sheet.appendRow(
-        ['Monthly Revenue', revenueData['monthlyRevenue'].toString()]);
+        [TextCellValue('Monthly Revenue'), TextCellValue(revenueData['monthlyRevenue'].toString())]);
     sheet
-        .appendRow(['Yearly Revenue', revenueData['yearlyRevenue'].toString()]);
+        .appendRow([TextCellValue('Yearly Revenue'), TextCellValue(revenueData['yearlyRevenue'].toString())]);
     sheet.appendRow([]);
 
     // Monthly Breakdown
     if (revenueData['monthlyData'] != null) {
-      sheet.appendRow(['Month', 'Revenue']);
+      sheet.appendRow([TextCellValue('Month'), TextCellValue('Revenue')]);
       for (var data in revenueData['monthlyData']) {
-        sheet.appendRow([data['month'], data['revenue'].toString()]);
+        sheet.appendRow([TextCellValue(data['month']), TextCellValue(data['revenue'].toString())]);
       }
     }
 

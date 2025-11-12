@@ -1,7 +1,8 @@
 class AppConfig {
   // API Configuration
-  static const String baseUrl = 'http://10.0.2.2:8081/api';
+  static const String baseUrl = 'http://localhost:8081/api';
   static const String apiVersion = 'v1';
+
 
   // Timeout Configuration
   static const Duration connectionTimeout = Duration(seconds: 30);

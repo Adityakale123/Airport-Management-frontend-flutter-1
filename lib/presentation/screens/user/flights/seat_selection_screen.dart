@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/routes/app_routes.dart';
 import '../../../providers/flight_provider.dart';
-import '../../../providers/booking_provider.dart';
 import '../../../widgets/common/loading_indicator.dart';
 import '../../../widgets/common/custom_button.dart';
 

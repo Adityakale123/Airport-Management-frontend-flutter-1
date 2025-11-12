@@ -137,18 +137,4 @@ class _SeatSelectionDialogState extends State<SeatSelectionDialog> {
       ],
     );
   }
-
-  static Future<String?> show(
-    BuildContext context, {
-    required List<Seat> seats,
-    String? selectedSeat,
-  }) {
-    return showDialog<String>(
-      context: context,
-      builder: (context) => SeatSelectionDialog(
-        seats: seats,
-        selectedSeat: selectedSeat,
-      ),
-    );
-  }
 }

@@ -340,6 +340,7 @@ class _UserFlightDetailsScreenState extends State<UserFlightDetailsScreen> {
           if (provider.selectedFlight == null) return SizedBox.shrink();
 
           final flight = provider.selectedFlight!;
+          final isSeatsAvailable = flight.availableSeats > 0;
 
           return Container(
             padding: EdgeInsets.all(16),
@@ -354,20 +355,23 @@ class _UserFlightDetailsScreenState extends State<UserFlightDetailsScreen> {
               ],
             ),
             child: SafeArea(
-              child: CustomButton(
-                text: 'Select Seat & Continue',
-                onPressed: flight.availableSeats > 0
-                    ? () {
-                        Navigator.pushNamed(
-                          context,
-                          AppRoutes.seatSelection,
-                          arguments: flight.id,
-                        );
-                      }
-                    : null,
-                icon: Icons.event_seat,
-                width: double.infinity,
-                height: 56,
+              child: Opacity(
+                opacity: isSeatsAvailable ? 1.0 : 0.5,
+                child: CustomButton(
+                  text: 'Select Seat & Continue',
+                  onPressed: isSeatsAvailable
+                      ? () {
+                          Navigator.pushNamed(
+                            context,
+                            AppRoutes.seatSelection,
+                            arguments: flight.id,
+                          );
+                        }
+                      : () {},
+                  icon: Icons.event_seat,
+                  width: double.infinity,
+                  height: 56,
+                ),
               ),
             ),
           );

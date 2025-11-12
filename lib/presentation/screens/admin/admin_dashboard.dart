@@ -13,8 +13,6 @@ class AdminDashboard extends StatefulWidget {
 }
 
 class _AdminDashboardState extends State<AdminDashboard> {
-  int _selectedIndex = 0;
-
   @override
   void initState() {
     super.initState();
@@ -132,7 +130,6 @@ class _AdminDashboardState extends State<AdminDashboard> {
             title: 'Dashboard',
             onTap: () {
               Navigator.pop(context);
-              setState(() => _selectedIndex = 0);
             },
           ),
           _buildDrawerItem(

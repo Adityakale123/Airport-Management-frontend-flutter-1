@@ -4,7 +4,6 @@ import '../../../core/constants/app_colors.dart';
 import '../../../core/routes/app_routes.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/booking_provider.dart';
-import '../../widgets/common/loading_indicator.dart';
 
 class UserDashboard extends StatefulWidget {
   @override

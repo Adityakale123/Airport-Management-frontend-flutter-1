@@ -1,3 +1,6 @@
+import 'flight.dart';
+import 'passenger.dart';
+
 class Booking {
   final int? id;
   final int userId;

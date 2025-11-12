@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../../core/constants/app_colors.dart';
 
 class FilterDialog extends StatefulWidget {
   final Map<String, dynamic>? initialFilters;
@@ -105,16 +104,6 @@ class _FilterDialogState extends State<FilterDialog> {
           child: Text('Apply'),
         ),
       ],
-    );
-  }
-
-  static Future<Map<String, dynamic>?> show(
-    BuildContext context, {
-    Map<String, dynamic>? initialFilters,
-  }) {
-    return showDialog<Map<String, dynamic>>(
-      context: context,
-      builder: (context) => FilterDialog(initialFilters: initialFilters),
     );
   }
 }

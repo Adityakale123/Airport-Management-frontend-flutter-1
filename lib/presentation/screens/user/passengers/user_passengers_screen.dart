@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/constants/app_colors.dart';
-import '../../../../core/routes/app_routes.dart';
 import '../../../widgets/common/search_bar.dart';
 import '../../../widgets/common/empty_state.dart';
-import '../../../widgets/cards/passenger_card.dart';
 import '../../../widgets/dialogs/confirmation_dialog.dart';
 
 class UserPassengersScreen extends StatefulWidget {

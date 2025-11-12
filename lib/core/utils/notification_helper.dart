@@ -34,7 +34,7 @@ class NotificationHelper {
   // Request permissions (iOS)
   static Future<bool> requestPermissions() async {
     final result = await _notifications
-        .resolvePlatformSpecificImplementation
+        .resolvePlatformSpecificImplementation<
             IOSFlutterLocalNotificationsPlugin>()
         ?.requestPermissions(
           alert: true,
