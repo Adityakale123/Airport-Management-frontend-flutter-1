@@ -109,7 +109,7 @@ class PdfGenerator {
                               booking.flight!.arrivalTime)
                           : 'N/A',
                     ),
-                    _buildInfoRow('Seat Number', booking.seatNo),
+                    _buildInfoRow('Seat Number', booking.seatNumber),
                     _buildInfoRow('Status', booking.status),
                   ],
                 ),
@@ -123,7 +123,8 @@ class PdfGenerator {
                       'Booking Date',
                       DateFormatter.formatDate(booking.bookingDate),
                     ),
-                    _buildInfoRow('Amount Paid', '₹${booking.amount}'),
+                    _buildInfoRow(
+                        'Amount Paid', '₹${booking.price.toStringAsFixed(2)}'),
                   ],
                 ),
                 pw.Spacer(),

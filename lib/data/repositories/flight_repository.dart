@@ -23,6 +23,16 @@ class FlightRepository {
     }
   }
 
+  // Get flight by ID (User)
+  Future<Flight> getUserFlightById(int id) async {
+    try {
+      final response = await ApiService.get(ApiEndpoints.userFlightById(id));
+      return Flight.fromJson(response);
+    } catch (e) {
+      throw Exception('Failed to fetch flight: ${e.toString()}');
+    }
+  }
+
   // Create flight (Admin)
   Future<Flight> createFlight(Map<String, dynamic> flightData) async {
     try {
@@ -61,9 +71,9 @@ class FlightRepository {
   // Search flights (User)
   Future<List<Flight>> searchFlights(Map<String, dynamic> searchParams) async {
     try {
-      final queryString = Uri(queryParameters: searchParams).query;
-      final response = await ApiService.get(
-        '${ApiEndpoints.searchFlights}?$queryString',
+      final response = await ApiService.post(
+        ApiEndpoints.searchFlights,
+        searchParams,
       );
       return (response as List).map((json) => Flight.fromJson(json)).toList();
     } catch (e) {

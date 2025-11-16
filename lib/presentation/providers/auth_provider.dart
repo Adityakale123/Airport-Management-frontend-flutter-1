@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import '../../data/models/user.dart';
 import '../../data/repositories/auth_repository.dart';
+import '../../data/repositories/user_repository.dart';
 
 class AuthProvider with ChangeNotifier {
   final AuthRepository _authRepository = AuthRepository();
@@ -56,8 +57,15 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
-  // Register
-  Future<bool> register(String name, String email, String password) async {
+  // Register - ✅ UPDATED
+  Future<bool> register(
+    String name,
+    String email,
+    String password,
+    String phone, {
+    // ✅ ADD phone parameter
+    String? address, // ✅ ADD address parameter (optional)
+  }) async {
     try {
       _errorMessage = null;
       notifyListeners();
@@ -66,7 +74,8 @@ class AuthProvider with ChangeNotifier {
         'name': name,
         'email': email,
         'password': password,
-        'role': 'USER',
+        'phone': phone, // ✅ ADD this
+        'address': address, // ✅ ADD this
       });
 
       return true;
@@ -105,6 +114,37 @@ class AuthProvider with ChangeNotifier {
   void updateUser(User user) {
     _user = user;
     notifyListeners();
+  }
+
+  // Add this to your AuthProvider class
+  Future<void> refreshUser() async {
+    try {
+      final userRepository = UserRepository();
+      final updatedUser = await userRepository.getProfile();
+      _user = updatedUser;
+      notifyListeners();
+    } catch (e) {
+      print('Failed to refresh user: $e');
+    }
+  }
+
+  // Update user profile
+  Future<bool> updateProfile(Map<String, dynamic> profileData) async {
+    try {
+      _errorMessage = null;
+      notifyListeners();
+
+      final userRepository = UserRepository();
+      final updatedUser = await userRepository.updateProfile(profileData);
+      _user = updatedUser;
+      _isAuthenticated = true;
+      notifyListeners();
+      return true;
+    } catch (e) {
+      _errorMessage = e.toString();
+      notifyListeners();
+      return false;
+    }
   }
 
   // Clear error

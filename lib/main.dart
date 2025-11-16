@@ -7,6 +7,8 @@ import 'presentation/providers/flight_provider.dart';
 import 'presentation/providers/booking_provider.dart';
 import 'presentation/providers/analytics_provider.dart';
 import 'presentation/providers/theme_provider.dart';
+import 'presentation/providers/staff_provider.dart';
+import 'presentation/providers/payment_provider.dart';
 import 'data/services/local_storage_service.dart';
 
 void main() async {
@@ -29,6 +31,8 @@ void main() async {
         ChangeNotifierProvider(create: (_) => FlightProvider()),
         ChangeNotifierProvider(create: (_) => BookingProvider()),
         ChangeNotifierProvider(create: (_) => AnalyticsProvider()),
+        ChangeNotifierProvider(create: (_) => StaffProvider()),
+        ChangeNotifierProvider(create: (_) => PaymentProvider()),
       ],
       child: MyApp(),
     ),

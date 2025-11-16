@@ -1,78 +1,97 @@
 class Flight {
   final int? id;
-  final String number;
-  final String airline;
-  final String source;
+  final String flightNumber;  // ✅ Not 'number'
+  final String origin;         // ✅ Not 'source'
   final String destination;
   final DateTime departureTime;
   final DateTime arrivalTime;
-  final String status;
-  final double price;
   final int totalSeats;
   final int availableSeats;
-  final String? aircraftType;
-  final String? terminal;
-  final String? gate;
+  final double economyPrice;
+  final double businessPrice;
+  final double firstClassPrice;
+  final String status;
+  final String? aircraftModel;
+  final int? terminalId;
+  final String? terminalName;
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
 
   Flight({
     this.id,
-    required this.number,
-    required this.airline,
-    required this.source,
+    required this.flightNumber,
+    required this.origin,
     required this.destination,
     required this.departureTime,
     required this.arrivalTime,
-    required this.status,
-    required this.price,
     required this.totalSeats,
     required this.availableSeats,
-    this.aircraftType,
-    this.terminal,
-    this.gate,
+    required this.economyPrice,
+    required this.businessPrice,
+    required this.firstClassPrice,
+    required this.status,
+    this.aircraftModel,
+    this.terminalId,
+    this.terminalName,
+    this.createdAt,
+    this.updatedAt,
   });
 
   factory Flight.fromJson(Map<String, dynamic> json) {
     return Flight(
       id: json['id'],
-      number: json['number'] ?? '',
-      airline: json['airline'] ?? '',
-      source: json['source'] ?? '',
-      destination: json['destination'] ?? '',
-      departureTime: DateTime.parse(json['departureTime'] ?? json['time']),
-      arrivalTime: DateTime.parse(json['arrivalTime'] ?? json['time']),
+      flightNumber: json['flightNumber'],
+      origin: json['origin'],
+      destination: json['destination'],
+      departureTime: DateTime.parse(json['departureTime']),
+      arrivalTime: DateTime.parse(json['arrivalTime']),
+      totalSeats: json['totalSeats'],
+      availableSeats: json['availableSeats'],
+      economyPrice: json['economyPrice']?.toDouble() ?? 0.0,
+      businessPrice: json['businessPrice']?.toDouble() ?? 0.0,
+      firstClassPrice: json['firstClassPrice']?.toDouble() ?? 0.0,
       status: json['status'] ?? 'SCHEDULED',
-      price: (json['price'] ?? 0).toDouble(),
-      totalSeats: json['totalSeats'] ?? 0,
-      availableSeats: json['availableSeats'] ?? 0,
-      aircraftType: json['aircraftType'],
-      terminal: json['terminal'],
-      gate: json['gate'],
+      aircraftModel: json['aircraftModel'],
+      terminalId: json['terminalId'],
+      terminalName: json['terminalName'],
+      createdAt: json['createdAt'] != null ? DateTime.parse(json['createdAt']) : null,
+      updatedAt: json['updatedAt'] != null ? DateTime.parse(json['updatedAt']) : null,
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
       'id': id,
-      'number': number,
-      'airline': airline,
-      'source': source,
+      'flightNumber': flightNumber,
+      'origin': origin,
       'destination': destination,
       'departureTime': departureTime.toIso8601String(),
       'arrivalTime': arrivalTime.toIso8601String(),
-      'status': status,
-      'price': price,
       'totalSeats': totalSeats,
       'availableSeats': availableSeats,
-      'aircraftType': aircraftType,
-      'terminal': terminal,
-      'gate': gate,
+      'economyPrice': economyPrice,
+      'businessPrice': businessPrice,
+      'firstClassPrice': firstClassPrice,
+      'status': status,
+      'aircraftModel': aircraftModel,
+      'terminalId': terminalId,
     };
   }
 
+  // Helper getters for backward compatibility if needed
+  String get number => flightNumber;
+  String get source => origin;
+  double get price => economyPrice;
+  String? get airline => null; // Remove if not used
+  String? get aircraftType => aircraftModel;
+  String? get terminal => terminalName;
+  String? get gate => null; // Remove if not used
+  
+  // Duration calculation
   String get duration {
-    final diff = arrivalTime.difference(departureTime);
-    final hours = diff.inHours;
-    final minutes = diff.inMinutes.remainder(60);
+    final difference = arrivalTime.difference(departureTime);
+    final hours = difference.inHours;
+    final minutes = difference.inMinutes.remainder(60);
     return '${hours}h ${minutes}m';
   }
 }

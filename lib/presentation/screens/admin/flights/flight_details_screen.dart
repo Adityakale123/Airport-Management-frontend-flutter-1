@@ -26,7 +26,7 @@ class _AdminFlightDetailsScreenState extends State<AdminFlightDetailsScreen> {
 
   Future<void> _loadFlightDetails() async {
     await Provider.of<FlightProvider>(context, listen: false)
-        .getFlightById(widget.flightId);
+        .getAdminFlightById(widget.flightId);
   }
 
   @override
@@ -81,7 +81,7 @@ class _AdminFlightDetailsScreenState extends State<AdminFlightDetailsScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        flight.number,
+                        flight.flightNumber, // ✅ UPDATED
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 32,
@@ -90,7 +90,8 @@ class _AdminFlightDetailsScreenState extends State<AdminFlightDetailsScreen> {
                       ),
                       SizedBox(height: 8),
                       Text(
-                        flight.airline,
+                        flight.aircraftModel ??
+                            'Aircraft Model N/A', // ✅ UPDATED
                         style: TextStyle(
                           color: Colors.white70,
                           fontSize: 18,
@@ -104,7 +105,7 @@ class _AdminFlightDetailsScreenState extends State<AdminFlightDetailsScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                flight.source,
+                                flight.origin, // ✅ UPDATED
                                 style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 24,
@@ -153,9 +154,11 @@ class _AdminFlightDetailsScreenState extends State<AdminFlightDetailsScreen> {
                           padding: EdgeInsets.all(16),
                           child: Column(
                             children: [
-                              _buildInfoRow('Flight Number', flight.number),
+                              _buildInfoRow('Flight Number',
+                                  flight.flightNumber), // ✅ UPDATED
                               Divider(height: 24),
-                              _buildInfoRow('Airline', flight.airline),
+                              _buildInfoRow('Aircraft Model',
+                                  flight.aircraftModel ?? 'N/A'), // ✅ UPDATED
                               Divider(height: 24),
                               _buildInfoRow('Status', flight.status),
                               Divider(height: 24),
@@ -185,14 +188,13 @@ class _AdminFlightDetailsScreenState extends State<AdminFlightDetailsScreen> {
                           child: Column(
                             children: [
                               _buildInfoRow(
-                                'Aircraft Type',
-                                flight.aircraftType ?? 'Not specified',
+                                'Aircraft Model',
+                                flight.aircraftModel ??
+                                    'Not specified', // ✅ UPDATED
                               ),
                               Divider(height: 24),
-                              _buildInfoRow(
-                                  'Terminal', flight.terminal ?? 'TBA'),
-                              Divider(height: 24),
-                              _buildInfoRow('Gate', flight.gate ?? 'TBA'),
+                              _buildInfoRow('Terminal',
+                                  flight.terminalName ?? 'TBA'), // ✅ UPDATED
                             ],
                           ),
                         ),
@@ -220,7 +222,14 @@ class _AdminFlightDetailsScreenState extends State<AdminFlightDetailsScreen> {
                                 '${flight.totalSeats - flight.availableSeats}',
                               ),
                               Divider(height: 24),
-                              _buildInfoRow('Base Price', '₹${flight.price}'),
+                              _buildInfoRow('Economy Price',
+                                  '₹${flight.economyPrice}'), // ✅ UPDATED
+                              Divider(height: 24),
+                              _buildInfoRow('Business Price',
+                                  '₹${flight.businessPrice}'), // ✅ ADDED
+                              Divider(height: 24),
+                              _buildInfoRow('First Class Price',
+                                  '₹${flight.firstClassPrice}'), // ✅ ADDED
                             ],
                           ),
                         ),
@@ -284,11 +293,14 @@ class _AdminFlightDetailsScreenState extends State<AdminFlightDetailsScreen> {
             color: AppColors.textSecondary,
           ),
         ),
-        Text(
-          value,
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
+        Flexible(
+          child: Text(
+            value,
+            textAlign: TextAlign.right,
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+            ),
           ),
         ),
       ],

@@ -3,7 +3,6 @@ class AppConfig {
   static const String baseUrl = 'http://localhost:8081/api';
   static const String apiVersion = 'v1';
 
-
   // Timeout Configuration
   static const Duration connectionTimeout = Duration(seconds: 30);
   static const Duration receiveTimeout = Duration(seconds: 30);

@@ -33,7 +33,7 @@ class _FlightSearchScreenState extends State<FlightSearchScreen> {
       firstDate: DateTime.now(),
       lastDate: DateTime.now().add(Duration(days: 365)),
     );
-    
+
     if (picked != null) {
       setState(() => _departureDate = picked);
     }
@@ -43,7 +43,7 @@ class _FlightSearchScreenState extends State<FlightSearchScreen> {
     if (!_formKey.currentState!.validate()) return;
     if (_departureDate == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Please select departure date')),
+        const SnackBar(content: Text('Please select departure date')),
       );
       return;
     }
@@ -51,9 +51,9 @@ class _FlightSearchScreenState extends State<FlightSearchScreen> {
     setState(() => _isLoading = true);
 
     final searchParams = {
-      'source': _sourceController.text.trim(),
+      'origin': _sourceController.text.trim(),
       'destination': _destinationController.text.trim(),
-      'date': DateFormatter.formatApiDate(_departureDate!),
+      'departureDate': DateFormatter.formatApiDate(_departureDate!),
     };
 
     await Provider.of<FlightProvider>(context, listen: false)
@@ -61,15 +61,21 @@ class _FlightSearchScreenState extends State<FlightSearchScreen> {
 
     setState(() => _isLoading = false);
 
-    Navigator.pushNamed(context, AppRoutes.flightList);
+    if (mounted) {
+      Navigator.pushNamed(context, AppRoutes.flightList);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Search Flights')),
+      appBar: AppBar(
+        title: const Text('Search Flights'),
+        backgroundColor: AppColors.primary,
+        foregroundColor: AppColors.white,
+      ),
       body: SingleChildScrollView(
-        padding: EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16),
         child: Form(
           key: _formKey,
           child: Column(
@@ -81,19 +87,20 @@ class _FlightSearchScreenState extends State<FlightSearchScreen> {
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Padding(
-                  padding: EdgeInsets.all(20),
+                  padding: const EdgeInsets.all(20),
                   child: Column(
                     children: [
-                      Icon(Icons.flight_takeoff, size: 48, color: AppColors.primary),
-                      SizedBox(height: 16),
-                      Text(
+                      Icon(Icons.flight_takeoff,
+                          size: 48, color: AppColors.primary),
+                      const SizedBox(height: 16),
+                      const Text(
                         'Find Your Flight',
                         style: TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      SizedBox(height: 24),
+                      const SizedBox(height: 24),
                       CustomTextField(
                         controller: _sourceController,
                         labelText: 'From',
@@ -102,7 +109,7 @@ class _FlightSearchScreenState extends State<FlightSearchScreen> {
                         validator: (value) =>
                             value?.isEmpty ?? true ? 'Required' : null,
                       ),
-                      SizedBox(height: 16),
+                      const SizedBox(height: 16),
                       CustomTextField(
                         controller: _destinationController,
                         labelText: 'To',
@@ -111,24 +118,26 @@ class _FlightSearchScreenState extends State<FlightSearchScreen> {
                         validator: (value) =>
                             value?.isEmpty ?? true ? 'Required' : null,
                       ),
-                      SizedBox(height: 16),
+                      const SizedBox(height: 16),
                       InkWell(
                         onTap: _selectDate,
                         child: Container(
-                          padding: EdgeInsets.all(16),
+                          padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
                             border: Border.all(color: AppColors.grey),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Row(
                             children: [
-                              Icon(Icons.calendar_today, color: AppColors.grey),
-                              SizedBox(width: 12),
+                              const Icon(Icons.calendar_today,
+                                  color: AppColors.grey),
+                              const SizedBox(width: 12),
                               Expanded(
                                 child: Text(
                                   _departureDate == null
                                       ? 'Select departure date'
-                                      : DateFormatter.formatDate(_departureDate!),
+                                      : DateFormatter.formatDate(
+                                          _departureDate!),
                                   style: TextStyle(
                                     color: _departureDate == null
                                         ? AppColors.grey
@@ -140,26 +149,25 @@ class _FlightSearchScreenState extends State<FlightSearchScreen> {
                           ),
                         ),
                       ),
-                      SizedBox(height: 24),
+                      const SizedBox(height: 24),
                       CustomButton(
                         text: 'Search Flights',
                         onPressed: _handleSearch,
                         isLoading: _isLoading,
                         width: double.infinity,
-                        icon: Icons.search,
                       ),
                     ],
                   ),
                 ),
               ),
-              SizedBox(height: 24),
-              Text(
+              const SizedBox(height: 24),
+              const Text(
                 'Popular Routes',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
-              SizedBox(height: 12),
-              _buildPopularRoute('Mumbai', 'Delhi'),
-              _buildPopularRoute('Bangalore', 'Mumbai'),
+              const SizedBox(height: 12),
+              _buildPopularRoute('Delhi', 'Mumbai'),
+              _buildPopularRoute('Mumbai', 'Bangalore'),
               _buildPopularRoute('Delhi', 'Goa'),
             ],
           ),
@@ -170,11 +178,11 @@ class _FlightSearchScreenState extends State<FlightSearchScreen> {
 
   Widget _buildPopularRoute(String from, String to) {
     return Card(
-      margin: EdgeInsets.only(bottom: 8),
+      margin: const EdgeInsets.only(bottom: 8),
       child: ListTile(
         leading: Icon(Icons.trending_up, color: AppColors.primary),
         title: Text('$from → $to'),
-        trailing: Icon(Icons.arrow_forward_ios, size: 16),
+        trailing: const Icon(Icons.arrow_forward_ios, size: 16),
         onTap: () {
           _sourceController.text = from;
           _destinationController.text = to;

@@ -76,10 +76,10 @@ class _FlightsManagementScreenState extends State<FlightsManagementScreen> {
 
                 final flights = provider.flights.where((flight) {
                   final query = _searchQuery;
-                  return flight.number.toLowerCase().contains(query) ||
-                      flight.source.toLowerCase().contains(query) ||
-                      flight.destination.toLowerCase().contains(query) ||
-                      flight.airline.toLowerCase().contains(query);
+                  // ✅ UPDATED - Use correct field names
+                  return flight.flightNumber.toLowerCase().contains(query) ||
+                      flight.origin.toLowerCase().contains(query) ||
+                      flight.destination.toLowerCase().contains(query);
                 }).toList();
 
                 if (flights.isEmpty) {

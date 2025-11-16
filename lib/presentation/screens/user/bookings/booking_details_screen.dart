@@ -225,7 +225,7 @@ class _BookingDetailsScreenState extends State<BookingDetailsScreen> {
                                 _buildInfoRow(
                                   Icons.event_seat,
                                   'Seat',
-                                  booking.seatNo,
+                                  booking.seatNumber,
                                 ),
                               ],
                             ),
@@ -253,7 +253,7 @@ class _BookingDetailsScreenState extends State<BookingDetailsScreen> {
                                   Text('Amount Paid',
                                       style: TextStyle(fontSize: 16)),
                                   Text(
-                                    '₹${booking.amount}',
+                                    '₹${booking.price.toStringAsFixed(2)}',
                                     style: TextStyle(
                                       fontSize: 20,
                                       fontWeight: FontWeight.bold,

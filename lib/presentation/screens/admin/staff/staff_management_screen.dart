@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../../../core/constants/app_colors.dart';
-import '../../../../core/constants/app_constants.dart';
 import '../../../../core/routes/app_routes.dart';
+import '../../../providers/staff_provider.dart';
 import '../../../widgets/common/search_bar.dart';
 import '../../../widgets/common/empty_state.dart';
 
@@ -14,68 +15,25 @@ class _StaffManagementScreenState extends State<StaffManagementScreen> {
   String _searchQuery = '';
   String _selectedRole = 'ALL';
 
-  // Mock data - replace with actual data from provider
-  final List<Map<String, dynamic>> _mockStaff = [
-    {
-      'id': 1,
-      'name': 'John Pilot',
-      'email': 'john.pilot@airline.com',
-      'phone': '+91 98765 43210',
-      'role': AppConstants.staffPilot,
-      'employeeId': 'EMP001',
-      'department': 'Flight Operations',
-    },
-    {
-      'id': 2,
-      'name': 'Sarah Crew',
-      'email': 'sarah.crew@airline.com',
-      'phone': '+91 98765 43211',
-      'role': AppConstants.staffCabinCrew,
-      'employeeId': 'EMP002',
-      'department': 'Cabin Services',
-    },
-    {
-      'id': 3,
-      'name': 'Mike Ground',
-      'email': 'mike.ground@airline.com',
-      'phone': '+91 98765 43212',
-      'role': AppConstants.staffGroundStaff,
-      'employeeId': 'EMP003',
-      'department': 'Ground Operations',
-    },
-    {
-      'id': 4,
-      'name': 'Lisa Engineer',
-      'email': 'lisa.engineer@airline.com',
-      'phone': '+91 98765 43213',
-      'role': AppConstants.staffEngineer,
-      'employeeId': 'EMP004',
-      'department': 'Engineering',
-    },
-  ];
+  @override
+  void initState() {
+    super.initState();
+    // Fetch staff data when screen loads
+    Future.microtask(() {
+      Provider.of<StaffProvider>(context, listen: false).getAllStaff();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    final filteredStaff = _mockStaff.where((staff) {
-      final matchesSearch = staff['name']
-              .toString()
-              .toLowerCase()
-              .contains(_searchQuery.toLowerCase()) ||
-          staff['employeeId']
-              .toString()
-              .toLowerCase()
-              .contains(_searchQuery.toLowerCase());
-      final matchesRole =
-          _selectedRole == 'ALL' || staff['role'] == _selectedRole;
-      return matchesSearch && matchesRole;
-    }).toList();
-
     return Scaffold(
       appBar: AppBar(
-        title: Text('Staff Management'),
+        title: const Text('Staff Management'),
+        backgroundColor: AppColors.primary,
+        foregroundColor: AppColors.white,
         actions: [
           IconButton(
-            icon: Icon(Icons.account_tree),
+            icon: const Icon(Icons.account_tree),
             onPressed: () {
               Navigator.pushNamed(context, AppRoutes.adminStaffHierarchy);
             },
@@ -83,62 +41,89 @@ class _StaffManagementScreenState extends State<StaffManagementScreen> {
           ),
         ],
       ),
-      body: Column(
-        children: [
-          CustomSearchBar(
-            hintText: 'Search staff...',
-            onChanged: (value) {
-              setState(() => _searchQuery = value);
-            },
-            onFilterPressed: _showFilterDialog,
-          ),
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: Row(
-              children: [
-                _buildRoleChip('ALL', 'All Staff'),
-                SizedBox(width: 8),
-                _buildRoleChip(AppConstants.staffPilot, 'Pilots'),
-                SizedBox(width: 8),
-                _buildRoleChip(AppConstants.staffCabinCrew, 'Cabin Crew'),
-                SizedBox(width: 8),
-                _buildRoleChip(AppConstants.staffGroundStaff, 'Ground Staff'),
-                SizedBox(width: 8),
-                _buildRoleChip(AppConstants.staffEngineer, 'Engineers'),
-              ],
-            ),
-          ),
-          Expanded(
-            child: filteredStaff.isEmpty
-                ? EmptyState(
-                    icon: Icons.people,
-                    title: 'No Staff Found',
-                    subtitle: _searchQuery.isEmpty
-                        ? 'Add your first staff member'
-                        : 'No staff match your search',
-                    actionText: 'Add Staff',
-                    onActionPressed: () {
-                      Navigator.pushNamed(context, AppRoutes.adminAddStaff);
-                    },
-                  )
-                : ListView.builder(
-                    padding: EdgeInsets.all(16),
-                    itemCount: filteredStaff.length,
-                    itemBuilder: (context, index) {
-                      final staff = filteredStaff[index];
-                      return _buildStaffCard(staff);
-                    },
-                  ),
-          ),
-        ],
+      body: Consumer<StaffProvider>(
+        builder: (context, staffProvider, _) {
+          final staffList = staffProvider.staffMembers;
+
+          // Filter staff based on search and role
+          final filteredStaff = staffList.where((staff) {
+            final fullName = '${staff.firstName} ${staff.lastName}';
+            final matchesSearch = fullName
+                    .toLowerCase()
+                    .contains(_searchQuery.toLowerCase()) ||
+                staff.email.toLowerCase().contains(_searchQuery.toLowerCase());
+
+            final matchesRole = _selectedRole == 'ALL' ||
+                staff.role == _selectedRole.replaceAll(' ', '_');
+            return matchesSearch && matchesRole;
+          }).toList();
+
+          return Column(
+            children: [
+              CustomSearchBar(
+                hintText: 'Search staff...',
+                onChanged: (value) {
+                  setState(() => _searchQuery = value);
+                },
+                onFilterPressed: _showFilterDialog,
+              ),
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                child: Row(
+                  children: [
+                    _buildRoleChip('ALL', 'All Staff'),
+                    const SizedBox(width: 8),
+                    _buildRoleChip('PILOT', 'Pilots'),
+                    const SizedBox(width: 8),
+                    _buildRoleChip('CABIN_CREW', 'Cabin Crew'),
+                    const SizedBox(width: 8),
+                    _buildRoleChip('GROUND_STAFF', 'Ground Staff'),
+                    const SizedBox(width: 8),
+                    _buildRoleChip('ENGINEER', 'Engineers'),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: staffProvider.isLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : filteredStaff.isEmpty
+                        ? EmptyState(
+                            icon: Icons.people,
+                            title: 'No Staff Found',
+                            subtitle: _searchQuery.isEmpty
+                                ? 'Add your first staff member'
+                                : 'No staff match your search',
+                            actionText: 'Add Staff',
+                            onActionPressed: () {
+                              Navigator.pushNamed(
+                                  context, AppRoutes.adminAddStaff);
+                            },
+                          )
+                        : ListView.builder(
+                            padding: const EdgeInsets.all(16),
+                            itemCount: filteredStaff.length,
+                            itemBuilder: (context, index) {
+                              final staff = filteredStaff[index];
+                              return _buildStaffCard(staff);
+                            },
+                          ),
+              ),
+            ],
+          );
+        },
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
-          Navigator.pushNamed(context, AppRoutes.adminAddStaff);
+          Navigator.pushNamed(context, AppRoutes.adminAddStaff).then((_) {
+            // Refresh staff list when returning from add staff screen
+            Provider.of<StaffProvider>(context, listen: false).getAllStaff();
+          });
         },
-        icon: Icon(Icons.add),
-        label: Text('Add Staff'),
+        backgroundColor: AppColors.primary,
+        icon: const Icon(Icons.add),
+        label: const Text('Add Staff'),
       ),
     );
   }
@@ -157,39 +142,43 @@ class _StaffManagementScreenState extends State<StaffManagementScreen> {
     );
   }
 
-  Widget _buildStaffCard(Map<String, dynamic> staff) {
+  Widget _buildStaffCard(staff) {
+    final fullName = '${staff.firstName} ${staff.lastName}';
+    final roleLabel = staff.role.replaceAll('_', ' ');
+
     return Card(
-      margin: EdgeInsets.only(bottom: 12),
+      margin: const EdgeInsets.only(bottom: 12),
       child: ListTile(
         leading: CircleAvatar(
-          backgroundColor: _getRoleColor(staff['role']).withOpacity(0.2),
+          backgroundColor: _getRoleColor(staff.role).withOpacity(0.2),
           child: Icon(
-            _getRoleIcon(staff['role']),
-            color: _getRoleColor(staff['role']),
+            _getRoleIcon(staff.role),
+            color: _getRoleColor(staff.role),
           ),
         ),
         title: Text(
-          staff['name'],
-          style: TextStyle(fontWeight: FontWeight.bold),
+          fullName,
+          style: const TextStyle(fontWeight: FontWeight.bold),
         ),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SizedBox(height: 4),
-            Text('${staff['role']} • ${staff['employeeId']}'),
+            const SizedBox(height: 4),
+            Text('$roleLabel • ${staff.email}'),
             Text(
-              staff['department'],
-              style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
+              staff.department ?? 'No Department',
+              style:
+                  const TextStyle(fontSize: 12, color: AppColors.textSecondary),
             ),
           ],
         ),
         trailing: PopupMenuButton(
-          icon: Icon(Icons.more_vert),
+          icon: const Icon(Icons.more_vert),
           itemBuilder: (context) => [
             PopupMenuItem(
               value: 'view',
               child: Row(
-                children: [
+                children: const [
                   Icon(Icons.visibility, size: 18),
                   SizedBox(width: 8),
                   Text('View Details'),
@@ -199,7 +188,7 @@ class _StaffManagementScreenState extends State<StaffManagementScreen> {
             PopupMenuItem(
               value: 'edit',
               child: Row(
-                children: [
+                children: const [
                   Icon(Icons.edit, size: 18),
                   SizedBox(width: 8),
                   Text('Edit'),
@@ -209,7 +198,7 @@ class _StaffManagementScreenState extends State<StaffManagementScreen> {
             PopupMenuItem(
               value: 'delete',
               child: Row(
-                children: [
+                children: const [
                   Icon(Icons.delete, size: 18, color: AppColors.error),
                   SizedBox(width: 8),
                   Text('Delete', style: TextStyle(color: AppColors.error)),
@@ -219,7 +208,7 @@ class _StaffManagementScreenState extends State<StaffManagementScreen> {
           ],
           onSelected: (value) {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('$value - ${staff['name']}')),
+              SnackBar(content: Text('$value - $fullName')),
             );
           },
         ),
@@ -230,11 +219,14 @@ class _StaffManagementScreenState extends State<StaffManagementScreen> {
     );
   }
 
-  void _showStaffDetails(Map<String, dynamic> staff) {
+  void _showStaffDetails(staff) {
+    final fullName = '${staff.firstName} ${staff.lastName}';
+    final roleLabel = staff.role.replaceAll('_', ' ');
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      shape: RoundedRectangleBorder(
+      shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (context) => DraggableScrollableSheet(
@@ -243,14 +235,14 @@ class _StaffManagementScreenState extends State<StaffManagementScreen> {
         maxChildSize: 0.95,
         expand: false,
         builder: (context, scrollController) => Container(
-          padding: EdgeInsets.all(24),
+          padding: const EdgeInsets.all(24),
           child: ListView(
             controller: scrollController,
             children: [
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
+                  const Text(
                     'Staff Details',
                     style: TextStyle(
                       fontSize: 24,
@@ -258,58 +250,62 @@ class _StaffManagementScreenState extends State<StaffManagementScreen> {
                     ),
                   ),
                   IconButton(
-                    icon: Icon(Icons.close),
+                    icon: const Icon(Icons.close),
                     onPressed: () => Navigator.pop(context),
                   ),
                 ],
               ),
-              SizedBox(height: 24),
+              const SizedBox(height: 24),
               Center(
                 child: CircleAvatar(
                   radius: 50,
-                  backgroundColor:
-                      _getRoleColor(staff['role']).withOpacity(0.2),
+                  backgroundColor: _getRoleColor(staff.role).withOpacity(0.2),
                   child: Icon(
-                    _getRoleIcon(staff['role']),
+                    _getRoleIcon(staff.role),
                     size: 40,
-                    color: _getRoleColor(staff['role']),
+                    color: _getRoleColor(staff.role),
                   ),
                 ),
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               Center(
                 child: Text(
-                  staff['name'],
-                  style: TextStyle(
+                  fullName,
+                  style: const TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
-              SizedBox(height: 8),
+              const SizedBox(height: 8),
               Center(
                 child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
                   decoration: BoxDecoration(
-                    color: _getRoleColor(staff['role']).withOpacity(0.2),
+                    color: _getRoleColor(staff.role).withOpacity(0.2),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
-                    staff['role'],
+                    roleLabel,
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
-                      color: _getRoleColor(staff['role']),
+                      color: _getRoleColor(staff.role),
                     ),
                   ),
                 ),
               ),
-              SizedBox(height: 24),
-              _buildDetailRow(Icons.badge, 'Employee ID', staff['employeeId']),
+              const SizedBox(height: 24),
+              _buildDetailRow(Icons.email, 'Email', staff.email),
+              _buildDetailRow(Icons.phone, 'Phone', staff.phone),
+              _buildDetailRow(Icons.business_center, 'Department',
+                  staff.department ?? 'N/A'),
+              _buildDetailRow(Icons.attach_money, 'Salary',
+                  staff.salary?.toString() ?? 'N/A'),
               _buildDetailRow(
-                  Icons.business_center, 'Department', staff['department']),
-              _buildDetailRow(Icons.email, 'Email', staff['email']),
-              _buildDetailRow(Icons.phone, 'Phone', staff['phone']),
-              SizedBox(height: 24),
+                  Icons.calendar_today, 'Hire Date', staff.hireDate ?? 'N/A'),
+              _buildDetailRow(Icons.info, 'Status', staff.status ?? 'ACTIVE'),
+              const SizedBox(height: 24),
               Row(
                 children: [
                   Expanded(
@@ -317,24 +313,24 @@ class _StaffManagementScreenState extends State<StaffManagementScreen> {
                       onPressed: () {
                         Navigator.pop(context);
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Edit staff')),
+                          const SnackBar(content: Text('Edit staff')),
                         );
                       },
-                      icon: Icon(Icons.edit),
-                      label: Text('Edit'),
+                      icon: const Icon(Icons.edit),
+                      label: const Text('Edit'),
                     ),
                   ),
-                  SizedBox(width: 12),
+                  const SizedBox(width: 12),
                   Expanded(
                     child: ElevatedButton.icon(
                       onPressed: () {
                         Navigator.pop(context);
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Contact staff')),
+                          const SnackBar(content: Text('Contact staff')),
                         );
                       },
-                      icon: Icon(Icons.message),
-                      label: Text('Contact'),
+                      icon: const Icon(Icons.message),
+                      label: const Text('Contact'),
                     ),
                   ),
                 ],
@@ -348,26 +344,26 @@ class _StaffManagementScreenState extends State<StaffManagementScreen> {
 
   Widget _buildDetailRow(IconData icon, String label, String value) {
     return Padding(
-      padding: EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.only(bottom: 16),
       child: Row(
         children: [
           Icon(icon, color: AppColors.primary, size: 24),
-          SizedBox(width: 16),
+          const SizedBox(width: 16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   label,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 12,
                     color: AppColors.textSecondary,
                   ),
                 ),
-                SizedBox(height: 4),
+                const SizedBox(height: 4),
                 Text(
                   value,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                   ),
@@ -382,17 +378,17 @@ class _StaffManagementScreenState extends State<StaffManagementScreen> {
 
   IconData _getRoleIcon(String role) {
     switch (role) {
-      case AppConstants.staffPilot:
+      case 'PILOT':
         return Icons.flight;
-      case AppConstants.staffCabinCrew:
+      case 'CABIN_CREW':
         return Icons.airline_seat_recline_extra;
-      case AppConstants.staffGroundStaff:
+      case 'GROUND_STAFF':
         return Icons.support_agent;
-      case AppConstants.staffEngineer:
+      case 'ENGINEER':
         return Icons.engineering;
-      case AppConstants.staffSecurity:
+      case 'SECURITY':
         return Icons.security;
-      case AppConstants.staffManager:
+      case 'MANAGER':
         return Icons.manage_accounts;
       default:
         return Icons.person;
@@ -401,17 +397,17 @@ class _StaffManagementScreenState extends State<StaffManagementScreen> {
 
   Color _getRoleColor(String role) {
     switch (role) {
-      case AppConstants.staffPilot:
+      case 'PILOT':
         return AppColors.primary;
-      case AppConstants.staffCabinCrew:
+      case 'CABIN_CREW':
         return AppColors.secondary;
-      case AppConstants.staffGroundStaff:
+      case 'GROUND_STAFF':
         return AppColors.warning;
-      case AppConstants.staffEngineer:
+      case 'ENGINEER':
         return AppColors.accent;
-      case AppConstants.staffSecurity:
+      case 'SECURITY':
         return AppColors.error;
-      case AppConstants.staffManager:
+      case 'MANAGER':
         return AppColors.info;
       default:
         return AppColors.grey;

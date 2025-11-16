@@ -16,7 +16,8 @@ class _UserDashboardState extends State<UserDashboard> {
   @override
   void initState() {
     super.initState();
-    _loadData();
+    // Delay loading to avoid setState during build
+    Future.microtask(() => _loadData());
   }
 
   Future<void> _loadData() async {
@@ -235,7 +236,7 @@ class _HomeTab extends StatelessWidget {
           'Flight Schedule',
           Icons.schedule,
           AppColors.warning,
-          () => Navigator.pushNamed(context, AppRoutes.flightList),
+          () => Navigator.pushNamed(context, AppRoutes.flightSearch),
         ),
         _buildActionCard(
           'Payment History',
@@ -288,7 +289,10 @@ class _HomeTab extends StatelessWidget {
     return Consumer<BookingProvider>(
       builder: (context, provider, child) {
         final upcomingBookings = provider.bookings
-            .where((b) => b.status == 'CONFIRMED' || b.status == 'CHECKED_IN')
+            .where((b) =>
+                b.status == 'PENDING' ||
+                b.status == 'CONFIRMED' ||
+                b.status == 'CHECKED_IN')
             .take(3)
             .toList();
 
@@ -334,7 +338,7 @@ class _HomeTab extends StatelessWidget {
       child: ListTile(
         leading: Icon(Icons.flight_takeoff, color: AppColors.primary),
         title: Text('PNR: ${booking.pnr ?? booking.id}'),
-        subtitle: Text('Seat: ${booking.seatNo}'),
+        subtitle: Text('Seat: ${booking.seatNumber}'),
         trailing: Icon(Icons.arrow_forward_ios, size: 16),
         onTap: () => Navigator.pushNamed(
           context,

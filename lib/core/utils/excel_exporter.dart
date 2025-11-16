@@ -30,8 +30,8 @@ class ExcelExporter {
         TextCellValue(booking.pnr ?? ''),
         TextCellValue(booking.passenger?.name ?? ''),
         TextCellValue(booking.flight?.number ?? ''),
-        TextCellValue(booking.seatNo),
-        TextCellValue(booking.amount.toString()),
+        TextCellValue(booking.seatNumber),
+        TextCellValue(booking.price.toStringAsFixed(2)),
         TextCellValue(booking.status),
         TextCellValue(booking.bookingDate.toString().split(' ')[0]),
       ]);
@@ -55,14 +55,16 @@ class ExcelExporter {
     // Header Row
     sheet.appendRow([
       TextCellValue('ID'),
-      TextCellValue('Number'),
-      TextCellValue('Airline'),
-      TextCellValue('Source'),
+      TextCellValue('Flight Number'),
+      TextCellValue('Aircraft Model'),
+      TextCellValue('Origin'),
       TextCellValue('Destination'),
       TextCellValue('Departure'),
       TextCellValue('Arrival'),
       TextCellValue('Status'),
-      TextCellValue('Price'),
+      TextCellValue('Economy Price'),
+      TextCellValue('Business Price'),
+      TextCellValue('First Class Price'),
       TextCellValue('Available Seats'),
     ]);
 
@@ -70,14 +72,16 @@ class ExcelExporter {
     for (var flight in flights) {
       sheet.appendRow([
         TextCellValue(flight.id.toString()),
-        TextCellValue(flight.number),
-        TextCellValue(flight.airline),
-        TextCellValue(flight.source),
+        TextCellValue(flight.flightNumber), // ✅ UPDATED
+        TextCellValue(flight.aircraftModel ?? 'N/A'), // ✅ UPDATED
+        TextCellValue(flight.origin), // ✅ UPDATED
         TextCellValue(flight.destination),
         TextCellValue(flight.departureTime.toString()),
         TextCellValue(flight.arrivalTime.toString()),
         TextCellValue(flight.status),
-        TextCellValue(flight.price.toString()),
+        TextCellValue(flight.economyPrice.toString()), // ✅ UPDATED
+        TextCellValue(flight.businessPrice.toString()), // ✅ ADDED
+        TextCellValue(flight.firstClassPrice.toString()), // ✅ ADDED
         TextCellValue(flight.availableSeats.toString()),
       ]);
     }
@@ -141,18 +145,28 @@ class ExcelExporter {
     // Summary Section
     sheet.appendRow([TextCellValue('Revenue Report')]);
     sheet.appendRow([]);
-    sheet.appendRow([TextCellValue('Total Revenue'), TextCellValue(revenueData['totalRevenue'].toString())]);
-    sheet.appendRow(
-        [TextCellValue('Monthly Revenue'), TextCellValue(revenueData['monthlyRevenue'].toString())]);
-    sheet
-        .appendRow([TextCellValue('Yearly Revenue'), TextCellValue(revenueData['yearlyRevenue'].toString())]);
+    sheet.appendRow([
+      TextCellValue('Total Revenue'),
+      TextCellValue(revenueData['totalRevenue'].toString())
+    ]);
+    sheet.appendRow([
+      TextCellValue('Monthly Revenue'),
+      TextCellValue(revenueData['monthlyRevenue'].toString())
+    ]);
+    sheet.appendRow([
+      TextCellValue('Yearly Revenue'),
+      TextCellValue(revenueData['yearlyRevenue'].toString())
+    ]);
     sheet.appendRow([]);
 
     // Monthly Breakdown
     if (revenueData['monthlyData'] != null) {
       sheet.appendRow([TextCellValue('Month'), TextCellValue('Revenue')]);
       for (var data in revenueData['monthlyData']) {
-        sheet.appendRow([TextCellValue(data['month']), TextCellValue(data['revenue'].toString())]);
+        sheet.appendRow([
+          TextCellValue(data['month']),
+          TextCellValue(data['revenue'].toString())
+        ]);
       }
     }
 

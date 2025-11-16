@@ -3,13 +3,16 @@ import 'package:provider/provider.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/routes/app_routes.dart';
 import '../../../providers/flight_provider.dart';
+import '../../../providers/booking_provider.dart';
+import '../../../providers/auth_provider.dart';
 import '../../../widgets/common/loading_indicator.dart';
 import '../../../widgets/common/custom_button.dart';
 
 class SeatSelectionScreen extends StatefulWidget {
   final int flightId;
 
-  const SeatSelectionScreen({Key? key, required this.flightId}) : super(key: key);
+  const SeatSelectionScreen({Key? key, required this.flightId})
+      : super(key: key);
 
   @override
   State<SeatSelectionScreen> createState() => _SeatSelectionScreenState();
@@ -17,19 +20,86 @@ class SeatSelectionScreen extends StatefulWidget {
 
 class _SeatSelectionScreenState extends State<SeatSelectionScreen> {
   String? _selectedSeat;
-  List<String> _occupiedSeats = ['1A', '1B', '2C', '3D', '4E', '5F'];
-  
+  String _selectedSeatClass = 'ECONOMY';
+  List<String> _occupiedSeats = [];
+  bool _isLoadingSeats = true;
+
   final int _rows = 20;
   final List<String> _columns = ['A', 'B', 'C', 'D', 'E', 'F'];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadOccupiedSeats();
+  }
+
+Future<void> _loadOccupiedSeats() async {
+    setState(() {
+      _isLoadingSeats = true;
+    });
+
+    try {
+      final bookingProvider = context.read<BookingProvider>();
+      
+     
+      final occupiedSeats = await bookingProvider.getOccupiedSeatsForFlight(widget.flightId);
+      
+      setState(() {
+        _occupiedSeats = occupiedSeats;
+        _isLoadingSeats = false;
+      });
+
+      print('Loaded ${_occupiedSeats.length} occupied seats for flight ${widget.flightId}');
+      print('Occupied seats: $_occupiedSeats');
+    } catch (e) {
+      print(' Error loading seats: $e');
+      setState(() {
+        _isLoadingSeats = false;
+      });
+      
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to load seat availability'),
+            backgroundColor: Colors.orange,
+          ),
+        );
+      }
+    }
+  }
+
+  double _getPrice() {
+    final flight =
+        Provider.of<FlightProvider>(context, listen: false).selectedFlight;
+    if (flight == null) return 0.0;
+
+    switch (_selectedSeatClass) {
+      case 'ECONOMY':
+        return flight.economyPrice;
+      case 'BUSINESS':
+        return flight.businessPrice;
+      case 'FIRST_CLASS':
+        return flight.firstClassPrice;
+      default:
+        return flight.economyPrice;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Select Your Seat'),
+        title: const Text('Select Your Seat'),
+        backgroundColor: AppColors.primary,
+        foregroundColor: AppColors.white,
         actions: [
           IconButton(
-            icon: Icon(Icons.help_outline),
+            icon: const Icon(Icons.refresh),
+            onPressed: _loadOccupiedSeats, 
+            tooltip: 'Refresh seats',
+          ),
+          IconButton(
+            icon: const Icon(Icons.help_outline),
             onPressed: _showSeatLegend,
           ),
         ],
@@ -40,11 +110,25 @@ class _SeatSelectionScreenState extends State<SeatSelectionScreen> {
             return LoadingIndicator();
           }
 
+         
+          if (_isLoadingSeats) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircularProgressIndicator(color: AppColors.primary),
+                  SizedBox(height: 16),
+                  Text('Loading seat availability...'),
+                ],
+              ),
+            );
+          }
+
           final flight = provider.selectedFlight!;
 
           return Column(
             children: [
-              // Flight Info Header
+              
               Container(
                 width: double.infinity,
                 padding: EdgeInsets.all(16),
@@ -66,11 +150,20 @@ class _SeatSelectionScreenState extends State<SeatSelectionScreen> {
                         color: AppColors.textSecondary,
                       ),
                     ),
+                    
+                    SizedBox(height: 4),
+                    Text(
+                      '${_occupiedSeats.length} seats booked',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: AppColors.error,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
                   ],
                 ),
               ),
 
-              // Seat Legend
               Padding(
                 padding: EdgeInsets.all(16),
                 child: Row(
@@ -83,14 +176,41 @@ class _SeatSelectionScreenState extends State<SeatSelectionScreen> {
                 ),
               ),
 
-              // Seat Map
+            
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Select Seat Class:',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    SizedBox(height: 8),
+                    Row(
+                      children: [
+                        _buildSeatClassButton('ECONOMY', 'Economy'),
+                        SizedBox(width: 8),
+                        _buildSeatClassButton('BUSINESS', 'Business'),
+                        SizedBox(width: 8),
+                        _buildSeatClassButton('FIRST_CLASS', 'First Class'),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+
+        
               Expanded(
                 child: SingleChildScrollView(
                   child: Padding(
                     padding: EdgeInsets.symmetric(horizontal: 16),
                     child: Column(
                       children: [
-                        // Cockpit
+                        
                         Container(
                           width: double.infinity,
                           padding: EdgeInsets.all(16),
@@ -103,7 +223,8 @@ class _SeatSelectionScreenState extends State<SeatSelectionScreen> {
                             ),
                           ),
                           child: Center(
-                            child: Icon(Icons.flight_takeoff, color: AppColors.primary),
+                            child: Icon(Icons.flight_takeoff,
+                                color: AppColors.primary),
                           ),
                         ),
 
@@ -120,10 +241,10 @@ class _SeatSelectionScreenState extends State<SeatSelectionScreen> {
                                   final seatNumber = '$rowNumber$col';
                                   return _buildSeat(seatNumber);
                                 }),
-                                
+
                                 // Aisle
                                 SizedBox(width: 40),
-                                
+
                                 // Right side seats (D, E, F)
                                 ..._columns.sublist(3, 6).map((col) {
                                   final seatNumber = '$rowNumber$col';
@@ -164,27 +285,43 @@ class _SeatSelectionScreenState extends State<SeatSelectionScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          'Selected Seat:',
-                          style: TextStyle(fontSize: 16),
-                        ),
-                        Container(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 8,
-                          ),
-                          decoration: BoxDecoration(
-                            color: AppColors.primary.withOpacity(0.2),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Text(
-                            _selectedSeat!,
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.primary,
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Selected Seat:',
+                              style: TextStyle(
+                                  fontSize: 14, color: AppColors.textSecondary),
                             ),
-                          ),
+                            SizedBox(height: 4),
+                            Text(
+                              _selectedSeat!,
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.primary,
+                              ),
+                            ),
+                          ],
+                        ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Text(
+                              'Price:',
+                              style: TextStyle(
+                                  fontSize: 14, color: AppColors.textSecondary),
+                            ),
+                            SizedBox(height: 4),
+                            Text(
+                              '₹${_getPrice().toStringAsFixed(2)}',
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.green,
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
@@ -218,11 +355,13 @@ class _SeatSelectionScreenState extends State<SeatSelectionScreen> {
     }
 
     return GestureDetector(
-      onTap: isOccupied ? null : () {
-        setState(() {
-          _selectedSeat = seatNumber;
-        });
-      },
+      onTap: isOccupied
+          ? null
+          : () {
+              setState(() {
+                _selectedSeat = seatNumber;
+              });
+            },
       child: Container(
         width: 45,
         height: 45,
@@ -274,6 +413,39 @@ class _SeatSelectionScreenState extends State<SeatSelectionScreen> {
     );
   }
 
+  Widget _buildSeatClassButton(String classCode, String label) {
+    final isSelected = _selectedSeatClass == classCode;
+    return Expanded(
+      child: GestureDetector(
+        onTap: () {
+          setState(() {
+            _selectedSeatClass = classCode;
+          });
+        },
+        child: Container(
+          padding: EdgeInsets.symmetric(vertical: 10),
+          decoration: BoxDecoration(
+            color: isSelected ? AppColors.primary : Colors.grey[200],
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(
+              color: isSelected ? AppColors.primary : Colors.grey[300]!,
+              width: 2,
+            ),
+          ),
+          child: Text(
+            label,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+              color: isSelected ? Colors.white : AppColors.textSecondary,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   void _showSeatLegend() {
     showDialog(
       context: context,
@@ -309,17 +481,116 @@ class _SeatSelectionScreenState extends State<SeatSelectionScreen> {
     );
   }
 
-  void _navigateToPassengerDetails() {
-    final flightProvider = Provider.of<FlightProvider>(context, listen: false);
-    
-    // Store selected seat and flight info for booking
-    Navigator.pushNamed(
-      context,
-      AppRoutes.userBookings, // This will be changed to passenger details screen
-      arguments: {
+  void _navigateToPassengerDetails() async {
+    if (_selectedSeat == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please select a seat')),
+      );
+      return;
+    }
+
+    if (_occupiedSeats.contains(_selectedSeat)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Seat $_selectedSeat is no longer available'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      setState(() {
+        _selectedSeat = null;
+      });
+      return;
+    }
+
+    _showLoadingDialog(context);
+
+    try {
+      final authProvider = context.read<AuthProvider>();
+      final bookingProvider = context.read<BookingProvider>();
+
+      final user = authProvider.user;
+      if (user == null) {
+        throw Exception('User not logged in');
+      }
+
+      final bookingData = {
         'flightId': widget.flightId,
-        'seatNo': _selectedSeat,
-        'flight': flightProvider.selectedFlight,
+        'userId': user.id ?? 0,
+        'passengerId': user.id ?? 0,
+        'seatNumber': _selectedSeat,
+        'seatClass': _selectedSeatClass,
+        'status': 'PENDING',
+        'price': _getPrice(),
+        'paymentStatus': 'PENDING',
+      };
+
+      final booking = await bookingProvider.createBooking(bookingData);
+
+      if (mounted) {
+        Navigator.pop(context);
+
+        if (booking != null && booking.id != null) {
+          Navigator.pushNamed(
+            context,
+            AppRoutes.payment,
+            arguments: booking.id,
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Failed to create booking'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        Navigator.pop(context);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Booking error: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  void _showLoadingDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          child: Center(
+            child: Container(
+              padding: EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  CircularProgressIndicator(
+                    color: AppColors.primary,
+                  ),
+                  SizedBox(height: 16),
+                  Text(
+                    'Creating your booking...',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
       },
     );
   }

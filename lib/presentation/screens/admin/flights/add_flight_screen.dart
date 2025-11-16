@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/constants/app_colors.dart';
-import '../../../../core/constants/app_constants.dart';
-import '../../../../core/utils/validators.dart';
-import '../../../../core/utils/date_formatter.dart';
 import '../../../providers/flight_provider.dart';
 import '../../../widgets/common/custom_button.dart';
 import '../../../widgets/common/custom_text_field.dart';
@@ -14,126 +11,155 @@ class AddFlightScreen extends StatefulWidget {
 }
 
 class _AddFlightScreenState extends State<AddFlightScreen> {
-  final _formKey = GlobalKey<FormState>();
-  final _flightNumberController = TextEditingController();
-  final _airlineController = TextEditingController();
-  final _sourceController = TextEditingController();
-  final _destinationController = TextEditingController();
-  final _priceController = TextEditingController();
-  final _totalSeatsController = TextEditingController();
-  final _aircraftTypeController = TextEditingController();
-  final _terminalController = TextEditingController();
-  final _gateController = TextEditingController();
-
-  DateTime? _departureTime;
-  DateTime? _arrivalTime;
-  String _status = AppConstants.flightScheduled;
+  late TextEditingController _flightNumberController;
+  late TextEditingController _originController;
+  late TextEditingController _destinationController;
+  late TextEditingController _departureTimeController;
+  late TextEditingController _arrivalTimeController;
+  late TextEditingController _totalSeatsController;
+  late TextEditingController _economyPriceController;
+  late TextEditingController _businessPriceController;
+  late TextEditingController _firstClassPriceController;
+  late TextEditingController _aircraftModelController;
+  late TextEditingController _terminalIdController;
   bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _flightNumberController = TextEditingController();
+    _originController = TextEditingController();
+    _destinationController = TextEditingController();
+    _departureTimeController = TextEditingController();
+    _arrivalTimeController = TextEditingController();
+    _totalSeatsController = TextEditingController();
+    _economyPriceController = TextEditingController();
+    _businessPriceController = TextEditingController();
+    _firstClassPriceController = TextEditingController();
+    _aircraftModelController = TextEditingController();
+    _terminalIdController = TextEditingController();
+  }
 
   @override
   void dispose() {
     _flightNumberController.dispose();
-    _airlineController.dispose();
-    _sourceController.dispose();
+    _originController.dispose();
     _destinationController.dispose();
-    _priceController.dispose();
+    _departureTimeController.dispose();
+    _arrivalTimeController.dispose();
     _totalSeatsController.dispose();
-    _aircraftTypeController.dispose();
-    _terminalController.dispose();
-    _gateController.dispose();
+    _economyPriceController.dispose();
+    _businessPriceController.dispose();
+    _firstClassPriceController.dispose();
+    _aircraftModelController.dispose();
+    _terminalIdController.dispose();
     super.dispose();
   }
 
-  Future<void> _selectDateTime(bool isDeparture) async {
+  Future<void> _selectDepartureDateTime() async {
     final date = await showDatePicker(
       context: context,
       initialDate: DateTime.now(),
       firstDate: DateTime.now(),
-      lastDate: DateTime.now().add(Duration(days: 365)),
+      lastDate: DateTime.now().add(const Duration(days: 365)),
     );
 
-    if (date != null) {
+    if (date != null && mounted) {
       final time = await showTimePicker(
         context: context,
         initialTime: TimeOfDay.now(),
       );
 
       if (time != null) {
-        final dateTime = DateTime(
-          date.year,
-          date.month,
-          date.day,
-          time.hour,
-          time.minute,
-        );
-
-        setState(() {
-          if (isDeparture) {
-            _departureTime = dateTime;
-          } else {
-            _arrivalTime = dateTime;
-          }
-        });
+        final dateTime =
+            DateTime(date.year, date.month, date.day, time.hour, time.minute);
+        _departureTimeController.text =
+            dateTime.toIso8601String().split('.')[0];
       }
     }
   }
 
-  Future<void> _handleSubmit() async {
-    if (!_formKey.currentState!.validate()) return;
+  Future<void> _selectArrivalDateTime() async {
+    final date = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now().add(const Duration(hours: 2)),
+      firstDate: DateTime.now(),
+      lastDate: DateTime.now().add(const Duration(days: 365)),
+    );
 
-    if (_departureTime == null || _arrivalTime == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text('Please select both departure and arrival times')),
+    if (date != null && mounted) {
+      final time = await showTimePicker(
+        context: context,
+        initialTime:
+            TimeOfDay.now().replacing(hour: (TimeOfDay.now().hour + 2) % 24),
       );
-      return;
-    }
 
-    if (_arrivalTime!.isBefore(_departureTime!)) {
+      if (time != null) {
+        final dateTime =
+            DateTime(date.year, date.month, date.day, time.hour, time.minute);
+        _arrivalTimeController.text = dateTime.toIso8601String().split('.')[0];
+      }
+    }
+  }
+
+  Future<void> _addFlight() async {
+    if (_flightNumberController.text.isEmpty ||
+        _originController.text.isEmpty ||
+        _destinationController.text.isEmpty ||
+        _departureTimeController.text.isEmpty ||
+        _arrivalTimeController.text.isEmpty ||
+        _totalSeatsController.text.isEmpty ||
+        _economyPriceController.text.isEmpty ||
+        _businessPriceController.text.isEmpty ||
+        _firstClassPriceController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Arrival time must be after departure time')),
+        const SnackBar(content: Text('Please fill all required fields')),
       );
       return;
     }
 
     setState(() => _isLoading = true);
+    try {
+      final flightData = {
+        'flightNumber': _flightNumberController.text,
+        'origin': _originController.text,
+        'destination': _destinationController.text,
+        'departureTime': _departureTimeController.text,
+        'arrivalTime': _arrivalTimeController.text,
+        'totalSeats': int.parse(_totalSeatsController.text),
+        'economyPrice': double.parse(_economyPriceController.text),
+        'businessPrice': double.parse(_businessPriceController.text),
+        'firstClassPrice': double.parse(_firstClassPriceController.text),
+        if (_aircraftModelController.text.isNotEmpty)
+          'aircraftModel': _aircraftModelController.text,
+        if (_terminalIdController.text.isNotEmpty)
+          'terminalId': int.parse(_terminalIdController.text),
+        'status': 'SCHEDULED',
+      };
 
-    final flightData = {
-      'number': _flightNumberController.text.trim(),
-      'airline': _airlineController.text.trim(),
-      'source': _sourceController.text.trim(),
-      'destination': _destinationController.text.trim(),
-      'departureTime': _departureTime!.toIso8601String(),
-      'arrivalTime': _arrivalTime!.toIso8601String(),
-      'status': _status,
-      'price': double.parse(_priceController.text),
-      'totalSeats': int.parse(_totalSeatsController.text),
-      'availableSeats': int.parse(_totalSeatsController.text),
-      'aircraftType': _aircraftTypeController.text.trim(),
-      'terminal': _terminalController.text.trim(),
-      'gate': _gateController.text.trim(),
-    };
+      final success = await Provider.of<FlightProvider>(context, listen: false)
+          .createFlight(flightData);
 
-    final provider = Provider.of<FlightProvider>(context, listen: false);
-    final success = await provider.createFlight(flightData);
-
-    setState(() => _isLoading = false);
-
-    if (success) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Flight added successfully!'),
-          backgroundColor: AppColors.success,
-        ),
-      );
-      Navigator.pop(context);
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(provider.errorMessage ?? 'Failed to add flight'),
-          backgroundColor: AppColors.error,
-        ),
-      );
+      if (mounted) {
+        setState(() => _isLoading = false);
+        if (success) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Flight added successfully')),
+          );
+          Navigator.pop(context);
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Failed to add flight')),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isLoading = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: ${e.toString()}')),
+        );
+      }
     }
   }
 
@@ -141,261 +167,128 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Add New Flight'),
+        title: const Text('Add New Flight'),
+        backgroundColor: AppColors.primary,
+        foregroundColor: AppColors.white,
       ),
-      body: Form(
-        key: _formKey,
-        child: ListView(
-          padding: EdgeInsets.all(16),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Flight Details',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
+            // Required Fields Section
+            const Text(
+              'Flight Information',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 12),
             CustomTextField(
               controller: _flightNumberController,
-              labelText: 'Flight Number',
+              labelText: 'Flight Number *',
               hintText: 'e.g., AI101',
-              prefixIcon: Icons.confirmation_number,
-              validator: (value) =>
-                  Validators.validateRequired(value, 'Flight number'),
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 12),
             CustomTextField(
-              controller: _airlineController,
-              labelText: 'Airline',
-              hintText: 'e.g., Air India',
-              prefixIcon: Icons.flight,
-              validator: (value) =>
-                  Validators.validateRequired(value, 'Airline'),
+              controller: _originController,
+              labelText: 'Origin Airport *',
+              hintText: 'e.g., Delhi (DEL)',
             ),
-            SizedBox(height: 16),
-            Row(
-              children: [
-                Expanded(
-                  child: CustomTextField(
-                    controller: _sourceController,
-                    labelText: 'Source',
-                    hintText: 'e.g., Mumbai',
-                    prefixIcon: Icons.flight_takeoff,
-                    validator: (value) =>
-                        Validators.validateRequired(value, 'Source'),
-                  ),
-                ),
-                SizedBox(width: 16),
-                Expanded(
-                  child: CustomTextField(
-                    controller: _destinationController,
-                    labelText: 'Destination',
-                    hintText: 'e.g., Delhi',
-                    prefixIcon: Icons.flight_land,
-                    validator: (value) =>
-                        Validators.validateRequired(value, 'Destination'),
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: 24),
-            Text(
-              'Schedule',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            SizedBox(height: 16),
-            InkWell(
-              onTap: () => _selectDateTime(true),
-              child: Container(
-                padding: EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  border: Border.all(color: AppColors.grey),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Row(
-                  children: [
-                    Icon(Icons.calendar_today, color: AppColors.primary),
-                    SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Departure Time',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: AppColors.textSecondary,
-                            ),
-                          ),
-                          SizedBox(height: 4),
-                          Text(
-                            _departureTime != null
-                                ? DateFormatter.formatDateTime(_departureTime!)
-                                : 'Select departure time',
-                            style: TextStyle(fontSize: 16),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            SizedBox(height: 16),
-            InkWell(
-              onTap: () => _selectDateTime(false),
-              child: Container(
-                padding: EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  border: Border.all(color: AppColors.grey),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Row(
-                  children: [
-                    Icon(Icons.calendar_today, color: AppColors.primary),
-                    SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Arrival Time',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: AppColors.textSecondary,
-                            ),
-                          ),
-                          SizedBox(height: 4),
-                          Text(
-                            _arrivalTime != null
-                                ? DateFormatter.formatDateTime(_arrivalTime!)
-                                : 'Select arrival time',
-                            style: TextStyle(fontSize: 16),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            SizedBox(height: 16),
-            DropdownButtonFormField<String>(
-              value: _status,
-              decoration: InputDecoration(
-                labelText: 'Status',
-                prefixIcon: Icon(Icons.info),
-                filled: true,
-                fillColor: AppColors.greyLight,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                  borderSide: BorderSide.none,
-                ),
-              ),
-              items: [
-                AppConstants.flightScheduled,
-                AppConstants.flightBoarding,
-                AppConstants.flightDeparted,
-                AppConstants.flightArrived,
-                AppConstants.flightDelayed,
-                AppConstants.flightCancelled,
-              ].map((status) {
-                return DropdownMenuItem(
-                  value: status,
-                  child: Text(status),
-                );
-              }).toList(),
-              onChanged: (value) {
-                setState(() => _status = value!);
-              },
-            ),
-            SizedBox(height: 24),
-            Text(
-              'Pricing & Capacity',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            SizedBox(height: 16),
-            Row(
-              children: [
-                Expanded(
-                  child: CustomTextField(
-                    controller: _priceController,
-                    labelText: 'Price (₹)',
-                    hintText: 'e.g., 5000',
-                    prefixIcon: Icons.currency_rupee,
-                    keyboardType: TextInputType.number,
-                    validator: (value) =>
-                        Validators.validateNumber(value, 'Price'),
-                  ),
-                ),
-                SizedBox(width: 16),
-                Expanded(
-                  child: CustomTextField(
-                    controller: _totalSeatsController,
-                    labelText: 'Total Seats',
-                    hintText: 'e.g., 180',
-                    prefixIcon: Icons.event_seat,
-                    keyboardType: TextInputType.number,
-                    validator: (value) =>
-                        Validators.validateNumber(value, 'Total seats'),
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: 24),
-            Text(
-              'Additional Information',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            SizedBox(height: 16),
+            const SizedBox(height: 12),
             CustomTextField(
-              controller: _aircraftTypeController,
-              labelText: 'Aircraft Type',
+              controller: _destinationController,
+              labelText: 'Destination Airport *',
+              hintText: 'e.g., Mumbai (BOM)',
+            ),
+            const SizedBox(height: 12),
+            GestureDetector(
+              onTap: _selectDepartureDateTime,
+              child: CustomTextField(
+                controller: _departureTimeController,
+                labelText: 'Departure Time *',
+                hintText: 'YYYY-MM-DDTHH:mm:ss',
+                enabled: false,
+              ),
+            ),
+            const SizedBox(height: 12),
+            GestureDetector(
+              onTap: _selectArrivalDateTime,
+              child: CustomTextField(
+                controller: _arrivalTimeController,
+                labelText: 'Arrival Time *',
+                hintText: 'YYYY-MM-DDTHH:mm:ss',
+                enabled: false,
+              ),
+            ),
+            const SizedBox(height: 20),
+
+            // Seat Information
+            const Text(
+              'Seat & Pricing Information',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 12),
+            CustomTextField(
+              controller: _totalSeatsController,
+              labelText: 'Total Seats *',
+              hintText: 'e.g., 180',
+              keyboardType: TextInputType.number,
+            ),
+            const SizedBox(height: 12),
+            CustomTextField(
+              controller: _economyPriceController,
+              labelText: 'Economy Price (₹) *',
+              hintText: 'e.g., 3000',
+              keyboardType: TextInputType.number,
+            ),
+            const SizedBox(height: 12),
+            CustomTextField(
+              controller: _businessPriceController,
+              labelText: 'Business Price (₹) *',
+              hintText: 'e.g., 6000',
+              keyboardType: TextInputType.number,
+            ),
+            const SizedBox(height: 12),
+            CustomTextField(
+              controller: _firstClassPriceController,
+              labelText: 'First Class Price (₹) *',
+              hintText: 'e.g., 10000',
+              keyboardType: TextInputType.number,
+            ),
+            const SizedBox(height: 20),
+
+            // Optional Fields Section
+            const Text(
+              'Additional Information (Optional)',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 12),
+            CustomTextField(
+              controller: _aircraftModelController,
+              labelText: 'Aircraft Model',
               hintText: 'e.g., Boeing 737',
-              prefixIcon: Icons.airplanemode_active,
             ),
-            SizedBox(height: 16),
-            Row(
-              children: [
-                Expanded(
-                  child: CustomTextField(
-                    controller: _terminalController,
-                    labelText: 'Terminal',
-                    hintText: 'e.g., Terminal 2',
-                    prefixIcon: Icons.business,
-                  ),
-                ),
-                SizedBox(width: 16),
-                Expanded(
-                  child: CustomTextField(
-                    controller: _gateController,
-                    labelText: 'Gate',
-                    hintText: 'e.g., Gate 12',
-                    prefixIcon: Icons.meeting_room,
-                  ),
-                ),
-              ],
+            const SizedBox(height: 12),
+            CustomTextField(
+              controller: _terminalIdController,
+              labelText: 'Terminal ID',
+              hintText: 'e.g., 1',
+              keyboardType: TextInputType.number,
             ),
-            SizedBox(height: 32),
+            const SizedBox(height: 32),
+
+            // Submit Button
             CustomButton(
-              text: 'Add Flight',
-              onPressed: _handleSubmit,
-              isLoading: _isLoading,
-              icon: Icons.add,
+              text: _isLoading ? 'Adding...' : 'Add Flight',
+              onPressed: _isLoading ? () {} : _addFlight,
               width: double.infinity,
               height: 56,
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
+            Text(
+              '* Required fields',
+              style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
+            ),
+            const SizedBox(height: 16),
           ],
         ),
       ),

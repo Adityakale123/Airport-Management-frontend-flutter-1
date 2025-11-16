@@ -28,7 +28,7 @@ class _UserFlightDetailsScreenState extends State<UserFlightDetailsScreen> {
 
   Future<void> _loadFlightDetails() async {
     await Provider.of<FlightProvider>(context, listen: false)
-        .getFlightById(widget.flightId);
+        .getUserFlightById(widget.flightId);
   }
 
   @override
@@ -81,73 +81,83 @@ class _UserFlightDetailsScreenState extends State<UserFlightDetailsScreen> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                flight.source,
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 28,
-                                  fontWeight: FontWeight.bold,
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  flight.source,
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 28,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
                                 ),
-                              ),
-                              Text(
-                                DateFormatter.formatTime(flight.departureTime),
-                                style: TextStyle(
-                                  color: Colors.white70,
-                                  fontSize: 16,
+                                Text(
+                                  DateFormatter.formatTime(
+                                      flight.departureTime),
+                                  style: const TextStyle(
+                                    color: Colors.white70,
+                                    fontSize: 16,
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
-                          Column(
-                            children: [
-                              Icon(Icons.flight_takeoff,
-                                  color: Colors.white, size: 32),
-                              SizedBox(height: 4),
-                              Text(
-                                flight.duration,
-                                style: TextStyle(
-                                  color: Colors.white70,
-                                  fontSize: 12,
+                          const Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 8),
+                            child: Column(
+                              children: [
+                                Icon(Icons.flight_takeoff,
+                                    color: Colors.white, size: 32),
+                                SizedBox(height: 4),
+                                Text(
+                                  'Flight',
+                                  style: TextStyle(
+                                    color: Colors.white70,
+                                    fontSize: 12,
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              Text(
-                                flight.destination,
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 28,
-                                  fontWeight: FontWeight.bold,
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                Text(
+                                  flight.destination,
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 28,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
                                 ),
-                              ),
-                              Text(
-                                DateFormatter.formatTime(flight.arrivalTime),
-                                style: TextStyle(
-                                  color: Colors.white70,
-                                  fontSize: 16,
+                                Text(
+                                  DateFormatter.formatTime(flight.arrivalTime),
+                                  style: const TextStyle(
+                                    color: Colors.white70,
+                                    fontSize: 16,
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ],
                       ),
-                      SizedBox(height: 16),
+                      const SizedBox(height: 16),
                       Container(
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 8),
                         decoration: BoxDecoration(
                           color: Colors.white.withOpacity(0.2),
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Text(
                           '${flight.number} • ${flight.airline}',
-                          style: TextStyle(
+                          style: const TextStyle(
                             color: Colors.white,
                             fontSize: 16,
                             fontWeight: FontWeight.w500,
@@ -340,7 +350,6 @@ class _UserFlightDetailsScreenState extends State<UserFlightDetailsScreen> {
           if (provider.selectedFlight == null) return SizedBox.shrink();
 
           final flight = provider.selectedFlight!;
-          final isSeatsAvailable = flight.availableSeats > 0;
 
           return Container(
             padding: EdgeInsets.all(16),
@@ -355,23 +364,20 @@ class _UserFlightDetailsScreenState extends State<UserFlightDetailsScreen> {
               ],
             ),
             child: SafeArea(
-              child: Opacity(
-                opacity: isSeatsAvailable ? 1.0 : 0.5,
-                child: CustomButton(
-                  text: 'Select Seat & Continue',
-                  onPressed: isSeatsAvailable
-                      ? () {
-                          Navigator.pushNamed(
-                            context,
-                            AppRoutes.seatSelection,
-                            arguments: flight.id,
-                          );
-                        }
-                      : () {},
-                  icon: Icons.event_seat,
-                  width: double.infinity,
-                  height: 56,
-                ),
+              child: CustomButton(
+                text: 'Select Seat & Continue',
+                onPressed: flight.availableSeats > 0
+                    ? () {
+                        Navigator.pushNamed(
+                          context,
+                          AppRoutes.seatSelection,
+                          arguments: flight.id,
+                        );
+                      }
+                    : () {},
+                icon: Icons.event_seat,
+                width: double.infinity,
+                height: 56,
               ),
             ),
           );

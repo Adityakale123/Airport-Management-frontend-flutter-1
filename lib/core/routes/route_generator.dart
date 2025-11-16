@@ -5,9 +5,12 @@ import '../../presentation/screens/auth/login_screen.dart';
 import '../../presentation/screens/auth/register_screen.dart';
 import '../../presentation/screens/auth/forgot_password_screen.dart';
 import '../../presentation/screens/admin/admin_dashboard.dart';
-import '../../presentation/screens/admin/flights/flights_management_screen.dart';
-import '../../presentation/screens/admin/flights/add_flight_screen.dart';
-import '../../presentation/screens/admin/flights/flight_details_screen.dart';
+import '../../presentation/screens/admin/flights/flights_management_screen.dart'
+    as adminFlightsScreen;
+import '../../presentation/screens/admin/flights/add_flight_screen.dart'
+    as addFlightScreen;
+import '../../presentation/screens/admin/flights/flight_details_screen.dart'
+    as adminFlightDetails;
 import '../../presentation/screens/admin/staff/staff_management_screen.dart';
 import '../../presentation/screens/admin/staff/add_staff_screen.dart';
 import '../../presentation/screens/admin/staff/staff_hierarchy_screen.dart';
@@ -24,7 +27,8 @@ import '../../presentation/screens/admin/settings/user_management_screen.dart';
 import '../../presentation/screens/user/user_dashboard.dart';
 import '../../presentation/screens/user/flights/flight_search_screen.dart';
 import '../../presentation/screens/user/flights/flight_list_screen.dart';
-import '../../presentation/screens/user/flights/flight_details_screen.dart';
+import '../../presentation/screens/user/flights/flight_details_screen.dart'
+    as userFlightDetails;
 import '../../presentation/screens/user/flights/seat_selection_screen.dart';
 import '../../presentation/screens/user/bookings/user_bookings_screen.dart';
 import '../../presentation/screens/user/bookings/booking_details_screen.dart';
@@ -54,12 +58,15 @@ class RouteGenerator {
       case AppRoutes.adminDashboard:
         return MaterialPageRoute(builder: (_) => AdminDashboard());
       case AppRoutes.adminFlights:
-        return MaterialPageRoute(builder: (_) => FlightsManagementScreen());
+        return MaterialPageRoute(
+            builder: (_) => adminFlightsScreen.FlightsManagementScreen());
       case AppRoutes.adminAddFlight:
-        return MaterialPageRoute(builder: (_) => AddFlightScreen());
+        return MaterialPageRoute(
+            builder: (_) => addFlightScreen.AddFlightScreen());
       case AppRoutes.adminFlightDetails:
         return MaterialPageRoute(
-          builder: (_) => AdminFlightDetailsScreen(flightId: args as int),
+          builder: (_) => adminFlightDetails.AdminFlightDetailsScreen(
+              flightId: args as int),
         );
       case AppRoutes.adminStaff:
         return MaterialPageRoute(builder: (_) => StaffManagementScreen());
@@ -97,7 +104,8 @@ class RouteGenerator {
         return MaterialPageRoute(builder: (_) => FlightListScreen());
       case AppRoutes.flightDetails:
         return MaterialPageRoute(
-          builder: (_) => UserFlightDetailsScreen(flightId: args as int),
+          builder: (_) =>
+              userFlightDetails.UserFlightDetailsScreen(flightId: args as int),
         );
       case AppRoutes.seatSelection:
         return MaterialPageRoute(

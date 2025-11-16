@@ -8,7 +8,8 @@ class NotificationHelper {
 
   // Initialize notifications
   static Future<void> initialize() async {
-    const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
+    const androidSettings =
+        AndroidInitializationSettings('@mipmap/ic_launcher');
     const iosSettings = DarwinInitializationSettings(
       requestAlertPermission: true,
       requestBadgePermission: true,
@@ -65,7 +66,7 @@ class NotificationHelper {
     await _notifications.show(
       booking.id ?? 0,
       'Booking Confirmed! ✈️',
-      'PNR: ${booking.pnr ?? booking.id} - Seat: ${booking.seatNo}',
+      'PNR: ${booking.pnr ?? booking.id} - Seat: ${booking.seatNumber}',
       details,
       payload: 'booking_${booking.id}',
     );
@@ -92,7 +93,7 @@ class NotificationHelper {
     await _notifications.show(
       flight.id ?? 0,
       'Flight Reminder 🛫',
-      'Flight ${flight.number} to ${flight.destination} - Seat: ${booking.seatNo}',
+      'Flight ${flight.number} to ${flight.destination} - Seat: ${booking.seatNumber}',
       details,
       payload: 'flight_${flight.id}',
     );

@@ -58,4 +58,13 @@ class BookingRepository {
       throw Exception('Failed to cancel booking: ${e.toString()}');
     }
   }
+
+   Future<List<String>> getOccupiedSeatsForFlight(int flightId) async {
+    try {
+      final response = await ApiService.get('/user/bookings/flight/$flightId/occupied-seats');
+      return List<String>.from(response);
+    } catch (e) {
+      throw Exception('Failed to fetch occupied seats: ${e.toString()}');
+    }
+  }
 }

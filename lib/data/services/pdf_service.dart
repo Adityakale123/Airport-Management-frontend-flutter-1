@@ -31,8 +31,8 @@ class PdfService {
               pw.Text('Flight: ${booking.flight?.number ?? 'N/A'}'),
               pw.Text('From: ${booking.flight?.source ?? 'N/A'}'),
               pw.Text('To: ${booking.flight?.destination ?? 'N/A'}'),
-              pw.Text('Seat: ${booking.seatNo}'),
-              pw.Text('Amount: ₹${booking.amount}'),
+              pw.Text('Seat: ${booking.seatNumber}'),
+              pw.Text('Amount: ₹${booking.price.toStringAsFixed(2)}'),
               pw.SizedBox(height: 20),
               pw.Text('Status: ${booking.status}'),
             ],
@@ -79,7 +79,7 @@ class PdfService {
               pw.Text('Flight: ${booking.flight?.number}'),
               pw.Text(
                   'Route: ${booking.flight?.source} → ${booking.flight?.destination}'),
-              pw.Text('Seat: ${booking.seatNo}'),
+              pw.Text('Seat: ${booking.seatNumber}'),
               pw.SizedBox(height: 20),
               pw.Divider(),
               pw.Row(
@@ -87,7 +87,7 @@ class PdfService {
                 children: [
                   pw.Text('Total Amount:'),
                   pw.Text(
-                    '₹${booking.amount}',
+                    '₹${booking.price.toStringAsFixed(2)}',
                     style: pw.TextStyle(
                       fontSize: 20,
                       fontWeight: pw.FontWeight.bold,

@@ -242,8 +242,8 @@ class _TicketScreenState extends State<TicketScreen> {
                                 _buildTicketRow(
                                     'Flight', booking.flight!.number),
                                 SizedBox(height: 12),
-                                _buildTicketRow(
-                                    'Airline', booking.flight!.airline),
+                                _buildTicketRow('Airline',
+                                    booking.flight!.airline ?? 'N/A'),
                                 SizedBox(height: 12),
                                 _buildTicketRow(
                                   'Date',
@@ -263,12 +263,13 @@ class _TicketScreenState extends State<TicketScreen> {
                                     'Phone', booking.passenger!.phone),
                                 Divider(height: 32),
                               ],
-                              _buildTicketRow('Seat Number', booking.seatNo),
+                              _buildTicketRow(
+                                  'Seat Number', booking.seatNumber),
                               SizedBox(height: 12),
                               _buildTicketRow('Status', booking.status),
                               SizedBox(height: 12),
-                              _buildTicketRow(
-                                  'Amount Paid', '₹${booking.amount}'),
+                              _buildTicketRow('Amount Paid',
+                                  '₹${booking.price.toStringAsFixed(2)}'),
                               SizedBox(height: 24),
                               Container(
                                 width: double.infinity,

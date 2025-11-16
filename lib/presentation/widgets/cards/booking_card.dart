@@ -90,7 +90,7 @@ class BookingCard extends StatelessWidget {
                 children: [
                   Icon(Icons.event_seat, size: 16, color: AppColors.grey),
                   SizedBox(width: 8),
-                  Text('Seat: ${booking.seatNo}',
+                  Text('Seat: ${booking.seatNumber}',
                       style: TextStyle(fontSize: 14)),
                 ],
               ),
@@ -116,7 +116,7 @@ class BookingCard extends StatelessWidget {
                         TextStyle(fontSize: 12, color: AppColors.textSecondary),
                   ),
                   Text(
-                    '₹${booking.amount}',
+                    '₹${booking.price.toStringAsFixed(2)}',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,

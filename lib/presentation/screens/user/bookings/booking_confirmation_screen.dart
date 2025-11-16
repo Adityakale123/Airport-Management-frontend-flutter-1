@@ -223,19 +223,28 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen>
                                   ],
                                 ),
                                 Divider(height: 32),
-                                _buildInfoRow('Flight', booking.flight!.number),
+                                _buildInfoRow(
+                                    'Flight', booking.flight?.number ?? 'N/A'),
                                 SizedBox(height: 12),
                                 _buildInfoRow(
                                   'Date',
-                                  DateFormatter.formatDate(
-                                    booking.flight!.departureTime,
-                                  ),
+                                  booking.flight != null
+                                      ? DateFormatter.formatDate(
+                                          booking.flight!.departureTime,
+                                        )
+                                      : 'N/A',
                                 ),
                                 SizedBox(height: 12),
+                                _buildInfoRow(
+                                    'Seat Number', booking.seatNumber),
+                                SizedBox(height: 12),
+                                _buildInfoRow('Class', booking.seatClass),
+                                SizedBox(height: 12),
+                                _buildInfoRow('Status', booking.status),
+                                SizedBox(height: 12),
+                                _buildInfoRow('Amount',
+                                    '₹${booking.price.toStringAsFixed(2)}'),
                               ],
-                              _buildInfoRow('Seat', booking.seatNo),
-                              SizedBox(height: 12),
-                              _buildInfoRow('Amount', '₹${booking.amount}'),
                             ],
                           ),
                         ),

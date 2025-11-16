@@ -1,75 +1,90 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../../../core/constants/app_colors.dart';
+import '../../../../core/routes/app_routes.dart';
 import '../../../../core/utils/date_formatter.dart';
+import '../../../providers/booking_provider.dart';
 import '../../../widgets/common/empty_state.dart';
+import '../../../widgets/common/loading_indicator.dart';
 
-class PaymentHistoryScreen extends StatelessWidget {
-  // Mock data - replace with actual data from provider
-  final List<Map<String, dynamic>> _mockPayments = [
-    {
-      'id': 1,
-      'amount': 5000.0,
-      'method': 'Credit Card',
-      'status': 'COMPLETED',
-      'date': DateTime.now().subtract(Duration(days: 2)),
-      'transactionId': 'TXN123456789',
-      'bookingPnr': 'ABC123',
-    },
-    {
-      'id': 2,
-      'amount': 3500.0,
-      'method': 'UPI',
-      'status': 'COMPLETED',
-      'date': DateTime.now().subtract(Duration(days: 15)),
-      'transactionId': 'TXN987654321',
-      'bookingPnr': 'DEF456',
-    },
-    {
-      'id': 3,
-      'amount': 7200.0,
-      'method': 'Net Banking',
-      'status': 'FAILED',
-      'date': DateTime.now().subtract(Duration(days: 30)),
-      'transactionId': 'TXN456789123',
-      'bookingPnr': 'GHI789',
-    },
-  ];
+class PaymentHistoryScreen extends StatefulWidget {
+  @override
+  State<PaymentHistoryScreen> createState() => _PaymentHistoryScreenState();
+}
+
+class _PaymentHistoryScreenState extends State<PaymentHistoryScreen> {
+  @override
+  void initState() {
+    super.initState();
+    Future.microtask(() {
+      Provider.of<BookingProvider>(context, listen: false).getUserBookings();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text('Payment History'),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () => Navigator.pop(context),
+        ),
         actions: [
           IconButton(
-            icon: Icon(Icons.filter_list),
+            icon: Icon(Icons.refresh),
             onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Filter payments')),
-              );
+              Provider.of<BookingProvider>(context, listen: false)
+                  .getUserBookings();
             },
           ),
         ],
       ),
-      body: _mockPayments.isEmpty
-          ? EmptyState(
+      body: Consumer<BookingProvider>(
+        builder: (context, provider, child) {
+          if (provider.isLoading) {
+            return LoadingIndicator(message: 'Loading payment history...');
+          }
+
+          // Get bookings with COMPLETED payment status or non-PENDING status
+          final payments = provider.bookings
+              .where((b) =>
+                  b.paymentStatus == 'COMPLETED' ||
+                  b.status == 'CONFIRMED' ||
+                  b.status == 'CHECKED_IN' ||
+                  b.status == 'BOARDED')
+              .toList();
+
+          if (payments.isEmpty) {
+            return EmptyState(
               icon: Icons.payment,
               title: 'No Payment History',
               subtitle: 'Your payment transactions will appear here',
-            )
-          : ListView.builder(
-              padding: EdgeInsets.all(16),
-              itemCount: _mockPayments.length,
-              itemBuilder: (context, index) {
-                final payment = _mockPayments[index];
-                return _buildPaymentCard(context, payment);
+              actionText: 'Book a Flight',
+              onActionPressed: () {
+                Navigator.pushNamed(context, AppRoutes.flightSearch);
               },
-            ),
+            );
+          }
+
+          return ListView.builder(
+            padding: EdgeInsets.all(16),
+            itemCount: payments.length,
+            itemBuilder: (context, index) {
+              final booking = payments[index];
+              return _buildPaymentCard(context, booking);
+            },
+          );
+        },
+      ),
     );
   }
 
-  Widget _buildPaymentCard(BuildContext context, Map<String, dynamic> payment) {
-    final isSuccess = payment['status'] == 'COMPLETED';
+  Widget _buildPaymentCard(BuildContext context, dynamic booking) {
+    final isSuccess = booking.paymentStatus == 'COMPLETED' ||
+        booking.status == 'CONFIRMED' ||
+        booking.status == 'CHECKED_IN' ||
+        booking.status == 'BOARDED';
 
     return Card(
       margin: EdgeInsets.only(bottom: 16),
@@ -78,7 +93,7 @@ class PaymentHistoryScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
       ),
       child: InkWell(
-        onTap: () => _showPaymentDetails(context, payment),
+        onTap: () => _showPaymentDetails(context, booking),
         borderRadius: BorderRadius.circular(12),
         child: Padding(
           padding: EdgeInsets.all(16),
@@ -109,7 +124,7 @@ class PaymentHistoryScreen extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            '₹${payment['amount']}',
+                            '₹${booking.price.toStringAsFixed(2)}',
                             style: TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
@@ -117,7 +132,7 @@ class PaymentHistoryScreen extends StatelessWidget {
                           ),
                           SizedBox(height: 4),
                           Text(
-                            payment['method'],
+                            'Flight: ${booking.flight?.number ?? 'N/A'}',
                             style: TextStyle(
                               fontSize: 14,
                               color: AppColors.textSecondary,
@@ -136,7 +151,7 @@ class PaymentHistoryScreen extends StatelessWidget {
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
-                      payment['status'],
+                      booking.paymentStatus ?? 'COMPLETED',
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
@@ -150,19 +165,19 @@ class PaymentHistoryScreen extends StatelessWidget {
               _buildInfoRow(
                 Icons.confirmation_number,
                 'Booking PNR',
-                payment['bookingPnr'],
+                booking.pnr ?? booking.id.toString(),
               ),
               SizedBox(height: 8),
               _buildInfoRow(
-                Icons.receipt,
-                'Transaction ID',
-                payment['transactionId'],
+                Icons.event_seat,
+                'Seat',
+                booking.seatNumber,
               ),
               SizedBox(height: 8),
               _buildInfoRow(
                 Icons.calendar_today,
                 'Date',
-                DateFormatter.formatDate(payment['date']),
+                DateFormatter.formatDate(booking.bookingDate),
               ),
             ],
           ),
@@ -196,7 +211,7 @@ class PaymentHistoryScreen extends StatelessWidget {
     );
   }
 
-  void _showPaymentDetails(BuildContext context, Map<String, dynamic> payment) {
+  void _showPaymentDetails(BuildContext context, dynamic booking) {
     showModalBottomSheet(
       context: context,
       shape: RoundedRectangleBorder(
@@ -225,14 +240,18 @@ class PaymentHistoryScreen extends StatelessWidget {
               ],
             ),
             SizedBox(height: 16),
-            _buildDetailRow('Amount', '₹${payment['amount']}'),
-            _buildDetailRow('Payment Method', payment['method']),
-            _buildDetailRow('Status', payment['status']),
-            _buildDetailRow('Transaction ID', payment['transactionId']),
-            _buildDetailRow('Booking PNR', payment['bookingPnr']),
+            _buildDetailRow('Amount', '₹${booking.price.toStringAsFixed(2)}'),
+            _buildDetailRow('Flight', booking.flight?.number ?? 'N/A'),
+            _buildDetailRow('Seat', booking.seatNumber),
+            _buildDetailRow('Seat Class', booking.seatClass ?? 'N/A'),
+            _buildDetailRow('Status', booking.status),
+            _buildDetailRow(
+                'Payment Status', booking.paymentStatus ?? 'COMPLETED'),
+            _buildDetailRow(
+                'Booking PNR', booking.pnr ?? booking.id.toString()),
             _buildDetailRow(
               'Date & Time',
-              DateFormatter.formatDateTime(payment['date']),
+              DateFormatter.formatDateTime(booking.bookingDate),
             ),
             SizedBox(height: 24),
             Row(

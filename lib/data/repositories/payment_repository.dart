@@ -1,5 +1,6 @@
 import '../services/api_service.dart';
 import '../models/payment.dart';
+import '../models/payment_dto.dart';
 import '../../core/constants/api_endpoints.dart';
 
 class PaymentRepository {
@@ -35,4 +36,30 @@ class PaymentRepository {
       throw Exception('Failed to fetch payment details: ${e.toString()}');
     }
   }
+
+  // Razorpay: Create order for booking
+  Future<CreateOrderResponseDTO> createOrderForBooking(int bookingId) async {
+    try {
+      final response = await ApiService.post(
+        '/user/payments/create-order/$bookingId',
+        {},
+      );
+      return CreateOrderResponseDTO.fromJson(response);
+    } catch (e) {
+      throw Exception('Failed to create payment order: ${e.toString()}');
+    }
+  }
+
+  // Razorpay: Verify payment and confirm booking
+  Future<void> verifyPayment(PaymentVerificationDTO verificationData) async {
+    try {
+      await ApiService.post(
+        '/user/payments/verify',
+        verificationData.toJson(),
+      );
+    } catch (e) {
+      throw Exception('Failed to verify payment: ${e.toString()}');
+    }
+  }
 }
+

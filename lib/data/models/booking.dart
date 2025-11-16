@@ -6,9 +6,11 @@ class Booking {
   final int userId;
   final int flightId;
   final int passengerId;
-  final String seatNo;
+  final String seatNumber; // Changed from seatNo to match backend
+  final String seatClass; // Added from backend
   final String status;
-  final double amount;
+  final double price; // Changed from amount to match backend
+  final String paymentStatus; // Added from backend
   final DateTime bookingDate;
   final String? pnr;
   final String? qrCode;
@@ -22,9 +24,11 @@ class Booking {
     required this.userId,
     required this.flightId,
     required this.passengerId,
-    required this.seatNo,
+    required this.seatNumber,
+    required this.seatClass,
     required this.status,
-    required this.amount,
+    required this.price,
+    required this.paymentStatus,
     required this.bookingDate,
     this.pnr,
     this.qrCode,
@@ -38,9 +42,11 @@ class Booking {
       userId: json['userId'] ?? 0,
       flightId: json['flightId'] ?? 0,
       passengerId: json['passengerId'] ?? 0,
-      seatNo: json['seatNo'] ?? '',
+      seatNumber: json['seatNumber'] ?? json['seatNo'] ?? '',
+      seatClass: json['seatClass'] ?? 'ECONOMY',
       status: json['status'] ?? 'CONFIRMED',
-      amount: (json['amount'] ?? 0).toDouble(),
+      price: (json['price'] ?? json['amount'] ?? 0).toDouble(),
+      paymentStatus: json['paymentStatus'] ?? 'PENDING',
       bookingDate: DateTime.parse(
         json['bookingDate'] ?? DateTime.now().toIso8601String(),
       ),
@@ -59,9 +65,11 @@ class Booking {
       'userId': userId,
       'flightId': flightId,
       'passengerId': passengerId,
-      'seatNo': seatNo,
+      'seatNumber': seatNumber,
+      'seatClass': seatClass,
       'status': status,
-      'amount': amount,
+      'price': price,
+      'paymentStatus': paymentStatus,
       'bookingDate': bookingDate.toIso8601String(),
       'pnr': pnr,
     };

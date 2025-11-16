@@ -129,4 +129,15 @@ class BookingProvider with ChangeNotifier {
     _errorMessage = null;
     notifyListeners();
   }
+
+  Future<List<String>> getOccupiedSeatsForFlight(int flightId) async {
+    try {
+      final occupiedSeats = await _bookingRepository.getOccupiedSeatsForFlight(flightId);
+      return occupiedSeats;
+    } catch (e) {
+      _errorMessage = e.toString();
+      notifyListeners();
+      return [];
+    }
+  }
 }

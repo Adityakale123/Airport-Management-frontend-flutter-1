@@ -21,7 +21,8 @@ class _UserBookingsScreenState extends State<UserBookingsScreen>
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
-    _loadBookings();
+    // Delay loading to avoid setState during build
+    Future.microtask(() => _loadBookings());
   }
 
   @override
@@ -40,6 +41,10 @@ class _UserBookingsScreenState extends State<UserBookingsScreen>
     return Scaffold(
       appBar: AppBar(
         title: Text('My Bookings'),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () => Navigator.pop(context),
+        ),
         bottom: TabBar(
           controller: _tabController,
           tabs: [
@@ -73,19 +78,37 @@ class _UserBookingsScreenState extends State<UserBookingsScreen>
             );
           }
 
-          return TabBarView(
-            controller: _tabController,
+          return Stack(
             children: [
-              _buildBookingsList(provider.bookings
-                  .where((b) =>
-                      b.status == 'CONFIRMED' || b.status == 'CHECKED_IN')
-                  .toList()),
-              _buildBookingsList(provider.bookings
-                  .where((b) => b.status == 'BOARDED')
-                  .toList()),
-              _buildBookingsList(provider.bookings
-                  .where((b) => b.status == 'CANCELLED')
-                  .toList()),
+              TabBarView(
+                controller: _tabController,
+                children: [
+                  _buildBookingsList(provider.bookings
+                      .where((b) =>
+                          b.status == 'PENDING' ||
+                          b.status == 'CONFIRMED' ||
+                          b.status == 'CHECKED_IN')
+                      .toList()),
+                  _buildBookingsList(provider.bookings
+                      .where((b) => b.status == 'BOARDED')
+                      .toList()),
+                  _buildBookingsList(provider.bookings
+                      .where((b) => b.status == 'CANCELLED')
+                      .toList()),
+                ],
+              ),
+              Positioned(
+                bottom: 24,
+                right: 24,
+                child: FloatingActionButton.extended(
+                  onPressed: () {
+                    Navigator.pushNamed(context, AppRoutes.flightSearch);
+                  },
+                  icon: Icon(Icons.add),
+                  label: Text('Book Flight'),
+                  backgroundColor: AppColors.primary,
+                ),
+              ),
             ],
           );
         },

@@ -33,8 +33,24 @@ class FlightProvider with ChangeNotifier {
     }
   }
 
-  // Get flight by ID
-  Future<void> getFlightById(int id) async {
+  // Get flight by ID (User - for viewing details after search)
+  Future<void> getUserFlightById(int id) async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      _selectedFlight = await _flightRepository.getUserFlightById(id);
+    } catch (e) {
+      _errorMessage = e.toString();
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  // Get flight by ID (Admin)
+  Future<void> getAdminFlightById(int id) async {
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
@@ -48,6 +64,8 @@ class FlightProvider with ChangeNotifier {
       notifyListeners();
     }
   }
+
+  // Get flight by ID (Admin)
 
   // Create flight
   Future<bool> createFlight(Map<String, dynamic> flightData) async {
@@ -76,7 +94,8 @@ class FlightProvider with ChangeNotifier {
     notifyListeners();
 
     try {
-      final updatedFlight = await _flightRepository.updateFlight(id, flightData);
+      final updatedFlight =
+          await _flightRepository.updateFlight(id, flightData);
       final index = _flights.indexWhere((f) => f.id == id);
       if (index != -1) {
         _flights[index] = updatedFlight;
