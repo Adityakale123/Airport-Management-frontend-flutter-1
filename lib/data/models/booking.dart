@@ -74,4 +74,39 @@ class Booking {
       'pnr': pnr,
     };
   }
+
+  // Add this method at the end of the Booking class before closing brace
+  Booking copyWith({
+    int? id,
+    int? userId,
+    int? flightId,
+    int? passengerId,
+    String? seatNumber,
+    String? seatClass,
+    String? status,
+    double? price,
+    String? paymentStatus,
+    DateTime? bookingDate,
+    String? pnr,
+    String? qrCode,
+    Flight? flight,
+    Passenger? passenger,
+  }) {
+    return Booking(
+      id: id ?? this.id,
+      userId: userId ?? this.userId,
+      flightId: flightId ?? this.flightId,
+      passengerId: passengerId ?? this.passengerId,
+      seatNumber: seatNumber ?? this.seatNumber,
+      seatClass: seatClass ?? this.seatClass,
+      status: status ?? this.status,
+      price: price ?? this.price,
+      paymentStatus: paymentStatus ?? this.paymentStatus,
+      bookingDate: bookingDate ?? this.bookingDate,
+      pnr: pnr ?? this.pnr,
+      qrCode: qrCode ?? this.qrCode,
+      flight: flight ?? this.flight,
+      passenger: passenger ?? this.passenger,
+    );
+  }
 }

@@ -10,6 +10,7 @@ import 'presentation/providers/theme_provider.dart';
 import 'presentation/providers/staff_provider.dart';
 import 'presentation/providers/payment_provider.dart';
 import 'data/services/local_storage_service.dart';
+import 'presentation/providers/billing_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -33,6 +34,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => AnalyticsProvider()),
         ChangeNotifierProvider(create: (_) => StaffProvider()),
         ChangeNotifierProvider(create: (_) => PaymentProvider()),
+        ChangeNotifierProvider(create: (_) => BillingProvider()),
       ],
       child: MyApp(),
     ),

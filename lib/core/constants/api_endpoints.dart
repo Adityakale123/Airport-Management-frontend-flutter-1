@@ -36,6 +36,10 @@ class ApiEndpoints {
   static const String createFlight = '/admin/flights';
   static String updateFlight(int id) => '/admin/flights/$id';
   static String deleteFlight(int id) => '/admin/flights/$id';
+  // Add this in the ADMIN section after adminFlights
+  static const String adminBookings = '/admin/bookings';
+  static String adminBookingsByFlight(int flightId) =>
+      '/admin/bookings/flight/$flightId';
 
   // ------------------ ADMIN STAFF ------------------
   static const String adminStaff = '/admin/staff';
@@ -56,6 +60,7 @@ class ApiEndpoints {
   static const String flightAnalytics = '/admin/analytics/flights';
   static const String bookingAnalytics = '/admin/analytics/bookings';
   static const String revenueAnalytics = '/admin/analytics/revenue';
+  static const String paymentAnalytics = '/admin/analytics/payments'; // NEW
 
   // ------------------ USER FLIGHTS ------------------
   static String userFlightById(int id) => '/flights/$id';
@@ -68,6 +73,11 @@ class ApiEndpoints {
   static const String processPayment = '/payments/process';
   static const String paymentHistory = '/payments/history';
   static String paymentDetails(int id) => '/payments/$id';
+
+  // ------------------ BILLING ------------------
+  static const String billingData = '/admin/billing';
+  static const String billingInvoices = '/admin/billing/invoices';
+  static const String billingPayments = '/admin/billing/payments';
 }
 
 // class ApiEndpoints {

@@ -6,6 +6,7 @@ class AppRoutes {
   static const String forgotPassword = '/forgot-password';
 
   // Admin Routes
+  static const String adminFlightBookings = '/admin/flights/bookings';
   static const String adminDashboard = '/admin/dashboard';
   static const String adminFlights = '/admin/flights';
   static const String adminFlightDetails = '/admin/flights/details';

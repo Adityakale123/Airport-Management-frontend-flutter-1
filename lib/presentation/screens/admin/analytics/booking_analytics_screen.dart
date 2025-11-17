@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../providers/analytics_provider.dart';
 import '../../../widgets/common/loading_indicator.dart';
+import 'package:intl/intl.dart';
 
 class BookingAnalyticsScreen extends StatefulWidget {
   @override
@@ -39,87 +40,110 @@ class _BookingAnalyticsScreenState extends State<BookingAnalyticsScreen> {
             return LoadingIndicator(message: 'Loading booking analytics...');
           }
 
-          return SingleChildScrollView(
-            padding: EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Booking Statistics',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
+          if (provider.errorMessage != null) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.error_outline, size: 64, color: AppColors.error),
+                  SizedBox(height: 16),
+                  Text('Failed to load booking analytics'),
+                  SizedBox(height: 8),
+                  Text(
+                    provider.errorMessage ?? '',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: AppColors.textSecondary),
                   ),
-                ),
-                SizedBox(height: 16),
-                GridView.count(
-                  shrinkWrap: true,
-                  physics: NeverScrollableScrollPhysics(),
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 16,
-                  mainAxisSpacing: 16,
-                  childAspectRatio: 1.5,
-                  children: [
-                    _buildStatCard('Total', '1,234', AppColors.primary),
-                    _buildStatCard('Confirmed', '1,180', AppColors.success),
-                    _buildStatCard('Pending', '42', AppColors.warning),
-                    _buildStatCard('Cancelled', '12', AppColors.error),
-                  ],
-                ),
-                SizedBox(height: 24),
-                Text(
-                  'Booking Trends',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
+                  SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: _loadAnalytics,
+                    child: Text('Retry'),
                   ),
-                ),
-                SizedBox(height: 16),
-                Card(
-                  child: Padding(
-                    padding: EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Last 7 Days',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        SizedBox(height: 16),
-                        _buildTrendRow('Mon', 45),
-                        _buildTrendRow('Tue', 52),
-                        _buildTrendRow('Wed', 48),
-                        _buildTrendRow('Thu', 60),
-                        _buildTrendRow('Fri', 72),
-                        _buildTrendRow('Sat', 85),
-                        _buildTrendRow('Sun', 68),
-                      ],
+                ],
+              ),
+            );
+          }
+
+          final bookingData = provider.bookingAnalytics ?? {};
+          final totalBookings = (bookingData['totalBookings'] ?? 0);
+          final confirmedBookings = (bookingData['confirmedBookings'] ?? 0);
+          final pendingBookings = (bookingData['pendingBookings'] ?? 0);
+          final cancelledBookings = (bookingData['cancelledBookings'] ?? 0);
+          final dailyTrends =
+              bookingData['dailyTrends'] as Map<String, dynamic>? ?? {};
+
+          return RefreshIndicator(
+            onRefresh: _loadAnalytics,
+            child: SingleChildScrollView(
+              padding: EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Booking Statistics',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
-                ),
-                SizedBox(height: 24),
-                Text(
-                  'Peak Booking Times',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
+                  SizedBox(height: 16),
+                  GridView.count(
+                    shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(),
+                    crossAxisCount: 2,
+                    crossAxisSpacing: 16,
+                    mainAxisSpacing: 16,
+                    childAspectRatio: 1.5,
+                    children: [
+                      _buildStatCard(
+                        'Total',
+                        totalBookings.toString(),
+                        AppColors.primary,
+                      ),
+                      _buildStatCard(
+                        'Confirmed',
+                        confirmedBookings.toString(),
+                        AppColors.success,
+                      ),
+                      _buildStatCard(
+                        'Pending',
+                        pendingBookings.toString(),
+                        AppColors.warning,
+                      ),
+                      _buildStatCard(
+                        'Cancelled',
+                        cancelledBookings.toString(),
+                        AppColors.error,
+                      ),
+                    ],
                   ),
-                ),
-                SizedBox(height: 16),
-                _buildTimeCard(
-                    'Morning (6 AM - 12 PM)', '35%', AppColors.primary),
-                SizedBox(height: 12),
-                _buildTimeCard(
-                    'Afternoon (12 PM - 6 PM)', '45%', AppColors.secondary),
-                SizedBox(height: 12),
-                _buildTimeCard(
-                    'Evening (6 PM - 12 AM)', '18%', AppColors.accent),
-                SizedBox(height: 12),
-                _buildTimeCard('Night (12 AM - 6 AM)', '2%', AppColors.grey),
-              ],
+                  SizedBox(height: 24),
+                  Text(
+                    'Booking Trends',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(height: 16),
+                  _buildTrendsCard(dailyTrends),
+                  SizedBox(height: 24),
+                  Text(
+                    'Summary',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(height: 16),
+                  _buildSummaryCard(
+                    totalBookings,
+                    confirmedBookings,
+                    pendingBookings,
+                    cancelledBookings,
+                  ),
+                ],
+              ),
             ),
           );
         },
@@ -163,9 +187,71 @@ class _BookingAnalyticsScreenState extends State<BookingAnalyticsScreen> {
     );
   }
 
-  Widget _buildTrendRow(String day, int bookings) {
-    final maxBookings = 100.0;
-    final percentage = (bookings / maxBookings);
+  Widget _buildTrendsCard(Map<String, dynamic> dailyTrends) {
+    if (dailyTrends.isEmpty) {
+      return Card(
+        child: Padding(
+          padding: EdgeInsets.all(32),
+          child: Center(
+            child: Column(
+              children: [
+                Icon(Icons.trending_up, size: 48, color: AppColors.grey),
+                SizedBox(height: 16),
+                Text(
+                  'No booking trends available',
+                  style: TextStyle(color: AppColors.textSecondary),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
+    // Sort dates and get last 7 days
+    final sortedEntries = dailyTrends.entries.toList()
+      ..sort((a, b) => a.key.compareTo(b.key));
+
+    // Get the max value for scaling
+    final maxBookings = sortedEntries.isEmpty
+        ? 100.0
+        : sortedEntries
+            .map((e) => (e.value as num).toDouble())
+            .reduce((a, b) => a > b ? a : b);
+
+    return Card(
+      child: Padding(
+        padding: EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Last 7 Days',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            SizedBox(height: 16),
+            ...sortedEntries.map((entry) {
+              final date = DateTime.parse(entry.key);
+              final bookings = (entry.value as num).toInt();
+              final dayName = DateFormat('EEE').format(date);
+
+              return _buildTrendRow(
+                dayName,
+                bookings,
+                maxBookings > 0 ? maxBookings : 100,
+              );
+            }).toList(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTrendRow(String day, int bookings, double maxBookings) {
+    final percentage = maxBookings > 0 ? (bookings / maxBookings) : 0.0;
 
     return Padding(
       padding: EdgeInsets.only(bottom: 12),
@@ -189,7 +275,7 @@ class _BookingAnalyticsScreenState extends State<BookingAnalyticsScreen> {
                   ),
                 ),
                 FractionallySizedBox(
-                  widthFactor: percentage,
+                  widthFactor: percentage.clamp(0.0, 1.0),
                   child: Container(
                     height: 24,
                     decoration: BoxDecoration(
@@ -211,44 +297,89 @@ class _BookingAnalyticsScreenState extends State<BookingAnalyticsScreen> {
     );
   }
 
-  Widget _buildTimeCard(String time, String percentage, Color color) {
+  Widget _buildSummaryCard(
+    int total,
+    int confirmed,
+    int pending,
+    int cancelled,
+  ) {
+    final confirmedPercent =
+        total > 0 ? (confirmed / total * 100).toStringAsFixed(1) : '0';
+    final pendingPercent =
+        total > 0 ? (pending / total * 100).toStringAsFixed(1) : '0';
+    final cancelledPercent =
+        total > 0 ? (cancelled / total * 100).toStringAsFixed(1) : '0';
+
     return Card(
       child: Padding(
         padding: EdgeInsets.all(16),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              children: [
-                Container(
-                  width: 8,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: color,
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                ),
-                SizedBox(width: 16),
-                Text(
-                  time,
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
-            ),
             Text(
-              percentage,
+              'Booking Status Distribution',
               style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: color,
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
               ),
+            ),
+            SizedBox(height: 20),
+            _buildPercentageRow(
+              'Confirmed',
+              confirmedPercent,
+              AppColors.success,
+            ),
+            SizedBox(height: 16),
+            _buildPercentageRow(
+              'Pending',
+              pendingPercent,
+              AppColors.warning,
+            ),
+            SizedBox(height: 16),
+            _buildPercentageRow(
+              'Cancelled',
+              cancelledPercent,
+              AppColors.error,
             ),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildPercentageRow(String label, String percentage, Color color) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Row(
+          children: [
+            Container(
+              width: 8,
+              height: 40,
+              decoration: BoxDecoration(
+                color: color,
+                borderRadius: BorderRadius.circular(4),
+              ),
+            ),
+            SizedBox(width: 16),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
+        Text(
+          '$percentage%',
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: color,
+          ),
+        ),
+      ],
     );
   }
 }

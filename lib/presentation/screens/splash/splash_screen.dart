@@ -85,7 +85,7 @@ class _SplashScreenState extends State<SplashScreen>
                   ),
                   SizedBox(height: 24),
                   Text(
-                    'Airport Management',
+                    'Welcome to Pushpak',
                     style: TextStyle(
                       fontSize: 32,
                       fontWeight: FontWeight.bold,

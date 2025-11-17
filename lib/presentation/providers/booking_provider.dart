@@ -132,12 +132,46 @@ class BookingProvider with ChangeNotifier {
 
   Future<List<String>> getOccupiedSeatsForFlight(int flightId) async {
     try {
-      final occupiedSeats = await _bookingRepository.getOccupiedSeatsForFlight(flightId);
+      final occupiedSeats =
+          await _bookingRepository.getOccupiedSeatsForFlight(flightId);
       return occupiedSeats;
     } catch (e) {
       _errorMessage = e.toString();
       notifyListeners();
       return [];
     }
+  }
+
+  // Add this property at the top with other properties
+  List<Booking>? _flightBookings;
+
+// Add this getter with other getters
+  List<Booking>? get flightBookings => _flightBookings;
+
+// Add these methods at the end before the closing brace
+
+// Get bookings by flight ID
+  Future<void> getBookingsByFlight(int flightId) async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      _flightBookings = await _bookingRepository.getBookingsByFlight(flightId);
+      _errorMessage = null;
+    } catch (e) {
+      _errorMessage = e.toString();
+      _flightBookings = [];
+      print('Error getting flight bookings: $e');
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+// Clear flight bookings
+  void clearFlightBookings() {
+    _flightBookings = null;
+    notifyListeners();
   }
 }

@@ -23,6 +23,19 @@ class BookingRepository {
     }
   }
 
+  // Add this method after getBookingById
+// Get bookings by flight ID
+  Future<List<Booking>> getBookingsByFlight(int flightId) async {
+    try {
+      final response = await ApiService.get(
+        ApiEndpoints.adminBookingsByFlight(flightId),
+      );
+      return (response as List).map((json) => Booking.fromJson(json)).toList();
+    } catch (e) {
+      throw Exception('Failed to fetch flight bookings: ${e.toString()}');
+    }
+  }
+
   // Create booking
   Future<Booking> createBooking(Map<String, dynamic> bookingData) async {
     try {
@@ -59,9 +72,10 @@ class BookingRepository {
     }
   }
 
-   Future<List<String>> getOccupiedSeatsForFlight(int flightId) async {
+  Future<List<String>> getOccupiedSeatsForFlight(int flightId) async {
     try {
-      final response = await ApiService.get('/user/bookings/flight/$flightId/occupied-seats');
+      final response = await ApiService.get(
+          '/user/bookings/flight/$flightId/occupied-seats');
       return List<String>.from(response);
     } catch (e) {
       throw Exception('Failed to fetch occupied seats: ${e.toString()}');
