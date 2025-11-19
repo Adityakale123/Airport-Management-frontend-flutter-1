@@ -77,19 +77,15 @@ class _PaymentScreenState extends State<PaymentScreen> {
       return;
     }
 
-    // For web, simulate payment success (in production, integrate with payment gateway)
-    // This is a placeholder for actual payment processing
     try {
-      // For web/test environment, generate proper test transaction IDs
-      // In production, this would come from actual payment gateway
       final timestamp = DateTime.now().millisecondsSinceEpoch.toString();
       final paymentId = 'pay_$timestamp';
       final orderId = paymentProvider.orderResponse!.orderId;
-      
+
       print('💳 Payment Submission:');
       print('  Payment ID: $paymentId');
       print('  Order ID: $orderId');
-      
+
       final verified = await paymentProvider.verifyPayment(
         paymentId,
         orderId,
@@ -114,9 +110,10 @@ class _PaymentScreenState extends State<PaymentScreen> {
           arguments: widget.bookingId,
         );
       } else if (mounted) {
-        final errorMsg = paymentProvider.errorMessage ?? 'Payment verification failed';
-        print('❌ Payment Error: $errorMsg');
-        
+        final errorMsg =
+            paymentProvider.errorMessage ?? 'Payment verification failed';
+        print(' Payment Error: $errorMsg');
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(errorMsg),
@@ -127,7 +124,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
       }
     } catch (e) {
       if (mounted) {
-        print('❌ Payment Exception: ${e.toString()}');
+        print('Payment Exception: ${e.toString()}');
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Payment failed: ${e.toString()}'),
@@ -241,12 +238,11 @@ class _PaymentScreenState extends State<PaymentScreen> {
                 ),
                 SizedBox(height: 16),
 
-                // Card Holder Name
                 TextField(
                   controller: _nameController,
                   decoration: InputDecoration(
                     labelText: 'Cardholder Name',
-                    hintText: 'John Doe',
+                    hintText: ' ',
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
@@ -255,7 +251,6 @@ class _PaymentScreenState extends State<PaymentScreen> {
                 ),
                 SizedBox(height: 16),
 
-                // Card Number
                 TextField(
                   controller: _cardNumberController,
                   decoration: InputDecoration(
@@ -270,7 +265,6 @@ class _PaymentScreenState extends State<PaymentScreen> {
                 ),
                 SizedBox(height: 16),
 
-                // Expiry and CVV
                 Row(
                   children: [
                     Expanded(
@@ -305,46 +299,45 @@ class _PaymentScreenState extends State<PaymentScreen> {
                 ),
                 SizedBox(height: 24),
 
-                // Test Card Info
-                Container(
-                  padding: EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Colors.amber.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: Colors.amber),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '🧪 TEST MODE',
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.amber[900],
-                        ),
-                      ),
-                      SizedBox(height: 8),
-                      Text(
-                        'Test Card: 4111 1111 1111 1111\nExpiry: Any future date (MM/YY)\nCVV: Any 3 digits',
-                        style: TextStyle(
-                          fontSize: 11,
-                          color: Colors.amber[900],
-                        ),
-                      ),
-                      SizedBox(height: 8),
-                      Text(
-                        'Note: This creates a test transaction. Real payments use Razorpay gateway.',
-                        style: TextStyle(
-                          fontSize: 10,
-                          color: Colors.amber[900],
-                          fontStyle: FontStyle.italic,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                SizedBox(height: 32),
+                // Container(
+                //   padding: EdgeInsets.all(12),
+                //   decoration: BoxDecoration(
+                //     color: Colors.amber.withOpacity(0.1),
+                //     borderRadius: BorderRadius.circular(8),
+                //     border: Border.all(color: Colors.amber),
+                //   ),
+                //   child: Column(
+                //     crossAxisAlignment: CrossAxisAlignment.start,
+                //     children: [
+                //       Text(
+                //         ' TEST MODE',
+                //         style: TextStyle(
+                //           fontSize: 12,
+                //           fontWeight: FontWeight.bold,
+                //           color: Colors.amber[900],
+                //         ),
+                //       ),
+                //       SizedBox(height: 8),
+                //       Text(
+                //         'Test Card: 4111 1111 1111 1111\nExpiry: Any future date (MM/YY)\nCVV: Any 3 digits',
+                //         style: TextStyle(
+                //           fontSize: 11,
+                //           color: Colors.amber[900],
+                //         ),
+                //       ),
+                //       SizedBox(height: 8),
+                //       Text(
+                //         'Note: This creates a test transaction. Real payments use Razorpay gateway.',
+                //         style: TextStyle(
+                //           fontSize: 10,
+                //           color: Colors.amber[900],
+                //           fontStyle: FontStyle.italic,
+                //         ),
+                //       ),
+                //     ],
+                //   ),
+                // ),
+                // SizedBox(height: 32),
 
                 // Pay Button
                 SizedBox(

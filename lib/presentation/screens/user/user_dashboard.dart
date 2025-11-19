@@ -211,40 +211,80 @@ class _HomeTab extends StatelessWidget {
     );
   }
 
+  // Widget _buildQuickActions(BuildContext context) {
+  //   return GridView.count(
+  //     shrinkWrap: true,
+  //     physics: NeverScrollableScrollPhysics(),
+  //     crossAxisCount: 2,
+  //     crossAxisSpacing: 16,
+  //     mainAxisSpacing: 16,
+  //     childAspectRatio: 1.3,
+  //     children: [
+  //       _buildActionCard(
+  //         'Search Flights',
+  //         Icons.search,
+  //         AppColors.primary,
+  //         () => Navigator.pushNamed(context, AppRoutes.flightSearch),
+  //       ),
+  //       _buildActionCard(
+  //         'My Bookings',
+  //         Icons.confirmation_number,
+  //         AppColors.secondary,
+  //         () => Navigator.pushNamed(context, AppRoutes.userBookings),
+  //       ),
+  //       _buildActionCard(
+  //         'Flight Schedule',
+  //         Icons.schedule,
+  //         AppColors.warning,
+  //         () => Navigator.pushNamed(context, AppRoutes.flightSearch),
+  //       ),
+  //       _buildActionCard(
+  //         'Payment History',
+  //         Icons.payment,
+  //         AppColors.accent,
+  //         () => Navigator.pushNamed(context, AppRoutes.paymentHistory),
+  //       ),
+  //     ],
+  //   );
+  // }
+
   Widget _buildQuickActions(BuildContext context) {
-    return GridView.count(
-      shrinkWrap: true,
-      physics: NeverScrollableScrollPhysics(),
-      crossAxisCount: 2,
-      crossAxisSpacing: 16,
-      mainAxisSpacing: 16,
-      childAspectRatio: 1.3,
-      children: [
-        _buildActionCard(
-          'Search Flights',
-          Icons.search,
-          AppColors.primary,
-          () => Navigator.pushNamed(context, AppRoutes.flightSearch),
-        ),
-        _buildActionCard(
-          'My Bookings',
-          Icons.confirmation_number,
-          AppColors.secondary,
-          () => Navigator.pushNamed(context, AppRoutes.userBookings),
-        ),
-        _buildActionCard(
-          'Flight Schedule',
-          Icons.schedule,
-          AppColors.warning,
-          () => Navigator.pushNamed(context, AppRoutes.flightSearch),
-        ),
-        _buildActionCard(
-          'Payment History',
-          Icons.payment,
-          AppColors.accent,
-          () => Navigator.pushNamed(context, AppRoutes.paymentHistory),
-        ),
-      ],
+    return SizedBox(
+      height: 300, // you can adjust height (260–350 usually fits well)
+      child: GridView.count(
+        shrinkWrap: true,
+        physics: NeverScrollableScrollPhysics(),
+        crossAxisCount: 2,
+        crossAxisSpacing: 16,
+        mainAxisSpacing: 16,
+        childAspectRatio: 1.3,
+        children: [
+          _buildActionCard(
+            'Search Flights',
+            Icons.search,
+            AppColors.primary,
+            () => Navigator.pushNamed(context, AppRoutes.flightSearch),
+          ),
+          _buildActionCard(
+            'My Bookings',
+            Icons.confirmation_number,
+            AppColors.secondary,
+            () => Navigator.pushNamed(context, AppRoutes.userBookings),
+          ),
+          _buildActionCard(
+            'Flight Schedule',
+            Icons.schedule,
+            AppColors.warning,
+            () => Navigator.pushNamed(context, AppRoutes.flightSearch),
+          ),
+          _buildActionCard(
+            'Payment History',
+            Icons.payment,
+            AppColors.accent,
+            () => Navigator.pushNamed(context, AppRoutes.paymentHistory),
+          ),
+        ],
+      ),
     );
   }
 

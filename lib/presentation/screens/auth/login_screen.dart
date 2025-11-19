@@ -89,7 +89,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                         SizedBox(height: 16),
                         Text(
-                          'Pushpak',
+                          'SkyMitra',
                           style: TextStyle(
                             fontSize: 28,
                             fontWeight: FontWeight.bold,

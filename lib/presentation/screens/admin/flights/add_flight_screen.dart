@@ -221,7 +221,6 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
             ),
             const SizedBox(height: 20),
 
-            // Seat Information
             const Text(
               'Seat & Pricing Information',
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),

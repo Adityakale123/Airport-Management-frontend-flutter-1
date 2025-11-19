@@ -381,7 +381,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                     SizedBox(height: 32),
 
-                    // Save Button
                     if (_isEditing)
                       Row(
                         children: [
@@ -484,7 +483,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 }
 
-// ==================== Document Preview Screen ====================
 class DocumentPreviewScreen extends StatelessWidget {
   final String documentUrl;
 

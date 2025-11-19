@@ -43,7 +43,6 @@ class AuthRepository {
       await LocalStorageService.deleteToken();
       await LocalStorageService.deleteUser();
     } catch (e) {
-      // Even if API call fails, clear local data
       await LocalStorageService.deleteToken();
       await LocalStorageService.deleteUser();
     }

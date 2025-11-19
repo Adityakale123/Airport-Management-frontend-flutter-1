@@ -128,7 +128,6 @@ class _AddStaffScreenState extends State<AddStaffScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Personal Information Section
               const Text(
                 'Personal Information',
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
@@ -167,7 +166,6 @@ class _AddStaffScreenState extends State<AddStaffScreen> {
               ),
               const SizedBox(height: 20),
 
-              // Employment Details Section
               const Text(
                 'Employment Details',
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
@@ -238,7 +236,6 @@ class _AddStaffScreenState extends State<AddStaffScreen> {
               ),
               const SizedBox(height: 20),
 
-              // Additional Information Section
               const Text(
                 'Additional Information',
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),

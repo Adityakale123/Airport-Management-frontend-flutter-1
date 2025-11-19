@@ -133,7 +133,6 @@ class _FlightBookingsScreenState extends State<FlightBookingsScreen> {
             onRefresh: _loadBookings,
             child: Column(
               children: [
-                // Summary Card
                 Container(
                   margin: EdgeInsets.all(16),
                   padding: EdgeInsets.all(16),
@@ -172,8 +171,6 @@ class _FlightBookingsScreenState extends State<FlightBookingsScreen> {
                     ],
                   ),
                 ),
-
-                // Bookings List
                 Expanded(
                   child: ListView.builder(
                     padding: EdgeInsets.symmetric(horizontal: 16),

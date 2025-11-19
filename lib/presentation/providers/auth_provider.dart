@@ -57,14 +57,13 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
-  // Register - ✅ UPDATED
+  // Register
   Future<bool> register(
     String name,
     String email,
     String password,
     String phone, {
-    // ✅ ADD phone parameter
-    String? address, // ✅ ADD address parameter (optional)
+    String? address,
   }) async {
     try {
       _errorMessage = null;
@@ -74,8 +73,8 @@ class AuthProvider with ChangeNotifier {
         'name': name,
         'email': email,
         'password': password,
-        'phone': phone, // ✅ ADD this
-        'address': address, // ✅ ADD this
+        'phone': phone,
+        'address': address,
       });
 
       return true;
@@ -110,13 +109,11 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
-  // Update user locally
   void updateUser(User user) {
     _user = user;
     notifyListeners();
   }
 
-  // Add this to your AuthProvider class
   Future<void> refreshUser() async {
     try {
       final userRepository = UserRepository();

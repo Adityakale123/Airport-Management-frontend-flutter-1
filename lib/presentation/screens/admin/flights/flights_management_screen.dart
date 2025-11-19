@@ -76,7 +76,7 @@ class _FlightsManagementScreenState extends State<FlightsManagementScreen> {
 
                 final flights = provider.flights.where((flight) {
                   final query = _searchQuery;
-                  // ✅ UPDATED - Use correct field names
+
                   return flight.flightNumber.toLowerCase().contains(query) ||
                       flight.origin.toLowerCase().contains(query) ||
                       flight.destination.toLowerCase().contains(query);
@@ -135,7 +135,6 @@ class _FlightsManagementScreenState extends State<FlightsManagementScreen> {
   }
 
   void _handleEditFlight(int flightId) {
-    // Navigate to edit screen (can use add screen with flightId)
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text('Edit functionality - Flight ID: $flightId')),
     );

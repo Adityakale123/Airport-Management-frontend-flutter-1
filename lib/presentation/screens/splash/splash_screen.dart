@@ -85,7 +85,7 @@ class _SplashScreenState extends State<SplashScreen>
                   ),
                   SizedBox(height: 24),
                   Text(
-                    'Welcome to Pushpak',
+                    'Welcome to SkyMitra',
                     style: TextStyle(
                       fontSize: 32,
                       fontWeight: FontWeight.bold,

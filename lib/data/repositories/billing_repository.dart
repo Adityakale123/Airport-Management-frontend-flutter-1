@@ -64,38 +64,3 @@ class BillingRepository {
     }
   }
 }
-
-// import '../services/api_service.dart';
-// import '../models/billing.dart';
-
-// class BillingRepository {
-//   Future<BillingData> getBillingData() async {
-//     try {
-//       // For now, use analytics endpoint
-//       final response = await ApiService.get('/admin/analytics');
-//       return BillingData.fromJson(response);
-//     } catch (e) {
-//       throw Exception('Failed to fetch billing data: ${e.toString()}');
-//     }
-//   }
-
-//   Future<List<Invoice>> getInvoices() async {
-//     try {
-//       // This endpoint needs to be created in backend
-//       final response = await ApiService.get('/admin/billing/invoices');
-//       return (response as List).map((e) => Invoice.fromJson(e)).toList();
-//     } catch (e) {
-//       throw Exception('Failed to fetch invoices: ${e.toString()}');
-//     }
-//   }
-
-//   Future<List<Payment>> getPayments() async {
-//     try {
-//       // This endpoint needs to be created in backend
-//       final response = await ApiService.get('/admin/billing/payments');
-//       return (response as List).map((e) => Payment.fromJson(e)).toList();
-//     } catch (e) {
-//       throw Exception('Failed to fetch payments: ${e.toString()}');
-//     }
-//   }
-// }

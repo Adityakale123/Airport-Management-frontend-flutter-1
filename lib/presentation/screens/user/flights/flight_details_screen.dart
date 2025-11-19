@@ -67,7 +67,6 @@ class _UserFlightDetailsScreenState extends State<UserFlightDetailsScreen> {
           return SingleChildScrollView(
             child: Column(
               children: [
-                // Flight Header Card
                 Container(
                   width: double.infinity,
                   decoration: BoxDecoration(
@@ -167,14 +166,11 @@ class _UserFlightDetailsScreenState extends State<UserFlightDetailsScreen> {
                     ],
                   ),
                 ),
-
-                // Flight Details
                 Padding(
                   padding: EdgeInsets.all(16),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Status Card
                       Card(
                         child: Padding(
                           padding: EdgeInsets.all(16),
@@ -211,8 +207,6 @@ class _UserFlightDetailsScreenState extends State<UserFlightDetailsScreen> {
                         ),
                       ),
                       SizedBox(height: 16),
-
-                      // Flight Information
                       Text(
                         'Flight Information',
                         style: TextStyle(
@@ -260,8 +254,6 @@ class _UserFlightDetailsScreenState extends State<UserFlightDetailsScreen> {
                         ),
                       ),
                       SizedBox(height: 16),
-
-                      // Price Information
                       Text(
                         'Fare Details',
                         style: TextStyle(

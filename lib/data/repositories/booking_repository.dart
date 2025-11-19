@@ -3,7 +3,6 @@ import '../models/booking.dart';
 import '../../core/constants/api_endpoints.dart';
 
 class BookingRepository {
-  // Get all user bookings
   Future<List<Booking>> getUserBookings() async {
     try {
       final response = await ApiService.get(ApiEndpoints.userBookings);
@@ -13,7 +12,6 @@ class BookingRepository {
     }
   }
 
-  // Get booking by ID
   Future<Booking> getBookingById(int id) async {
     try {
       final response = await ApiService.get(ApiEndpoints.userBookingById(id));
@@ -23,8 +21,6 @@ class BookingRepository {
     }
   }
 
-  // Add this method after getBookingById
-// Get bookings by flight ID
   Future<List<Booking>> getBookingsByFlight(int flightId) async {
     try {
       final response = await ApiService.get(
@@ -36,7 +32,6 @@ class BookingRepository {
     }
   }
 
-  // Create booking
   Future<Booking> createBooking(Map<String, dynamic> bookingData) async {
     try {
       final response = await ApiService.post(
@@ -49,7 +44,6 @@ class BookingRepository {
     }
   }
 
-  // Update booking
   Future<Booking> updateBooking(
       int id, Map<String, dynamic> bookingData) async {
     try {
@@ -63,7 +57,6 @@ class BookingRepository {
     }
   }
 
-  // Cancel booking
   Future<void> cancelBooking(int id) async {
     try {
       await ApiService.delete(ApiEndpoints.deleteBooking(id));

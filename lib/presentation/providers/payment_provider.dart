@@ -36,15 +36,6 @@ class PaymentProvider with ChangeNotifier {
     }
   }
 
-  // Verify payment
-  /// Verifies payment with backend
-  /// For web environment, backend should accept test signatures
-  /// Backend requires: 
-  /// 1. Razorpay test API keys configured (RAZORPAY_KEY_TEST, RAZORPAY_SECRET_TEST)
-  /// 2. Either accept test signatures OR disable verification for development
-  /// 
-  /// Error: "Invalid Razorpay signature" means backend is rejecting the test data
-  /// Solution: Backend team needs to configure test mode or provide /verify-test endpoint
   Future<bool> verifyPayment(
     String razorpayPaymentId,
     String razorpayOrderId,

@@ -24,6 +24,7 @@ class AppRoutes {
   static const String adminBookingAnalytics = '/admin/analytics/bookings';
   static const String adminSettings = '/admin/settings';
   static const String adminUserManagement = '/admin/user-management';
+  static const String adminAddTerminal = '/admin/terminals/add';
 
   // User Routes
   static const String userDashboard = '/user/dashboard';

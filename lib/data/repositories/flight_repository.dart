@@ -3,7 +3,6 @@ import '../models/flight.dart';
 import '../../core/constants/api_endpoints.dart';
 
 class FlightRepository {
-  // Get all flights (Admin)
   Future<List<Flight>> getAdminFlights() async {
     try {
       final response = await ApiService.get(ApiEndpoints.adminFlights);
@@ -13,7 +12,6 @@ class FlightRepository {
     }
   }
 
-  // Get flight by ID (Admin)
   Future<Flight> getAdminFlightById(int id) async {
     try {
       final response = await ApiService.get(ApiEndpoints.adminFlightById(id));
@@ -23,7 +21,6 @@ class FlightRepository {
     }
   }
 
-  // Get flight by ID (User)
   Future<Flight> getUserFlightById(int id) async {
     try {
       final response = await ApiService.get(ApiEndpoints.userFlightById(id));
@@ -33,7 +30,6 @@ class FlightRepository {
     }
   }
 
-  // Create flight (Admin)
   Future<Flight> createFlight(Map<String, dynamic> flightData) async {
     try {
       final response = await ApiService.post(
@@ -46,7 +42,6 @@ class FlightRepository {
     }
   }
 
-  // Update flight (Admin)
   Future<Flight> updateFlight(int id, Map<String, dynamic> flightData) async {
     try {
       final response = await ApiService.put(
@@ -59,7 +54,6 @@ class FlightRepository {
     }
   }
 
-  // Delete flight (Admin)
   Future<void> deleteFlight(int id) async {
     try {
       await ApiService.delete(ApiEndpoints.deleteFlight(id));
@@ -68,7 +62,6 @@ class FlightRepository {
     }
   }
 
-  // Search flights (User)
   Future<List<Flight>> searchFlights(Map<String, dynamic> searchParams) async {
     try {
       final response = await ApiService.post(
@@ -81,7 +74,6 @@ class FlightRepository {
     }
   }
 
-  // Get available seats
   Future<List<dynamic>> getAvailableSeats(int flightId) async {
     try {
       final response = await ApiService.get(

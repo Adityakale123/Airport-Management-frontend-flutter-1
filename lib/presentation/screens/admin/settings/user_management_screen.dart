@@ -13,12 +13,11 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
   String _searchQuery = '';
   String _selectedRole = 'ALL';
 
-  // Mock data
   final List<Map<String, dynamic>> _mockUsers = [
     {
       'id': 1,
-      'name': 'John Doe',
-      'email': 'john.doe@example.com',
+      'name': 'Hari',
+      'email': 'hari@gmail.com',
       'phone': '+91 98765 43210',
       'role': 'USER',
       'status': 'ACTIVE',
@@ -27,8 +26,8 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
     },
     {
       'id': 2,
-      'name': 'Jane Smith',
-      'email': 'jane.smith@example.com',
+      'name': 'pranav',
+      'email': 'pranav@gmail.com',
       'phone': '+91 98765 43211',
       'role': 'USER',
       'status': 'ACTIVE',
@@ -37,8 +36,8 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
     },
     {
       'id': 3,
-      'name': 'Admin User',
-      'email': 'admin@airport.com',
+      'name': 'Rishikesh',
+      'email': 'rishikesh@gmail.com',
       'phone': '+91 98765 43212',
       'role': 'ADMIN',
       'status': 'ACTIVE',
@@ -47,8 +46,8 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
     },
     {
       'id': 4,
-      'name': 'Bob Johnson',
-      'email': 'bob.johnson@example.com',
+      'name': 'yash',
+      'email': 'yash@gmail.com',
       'phone': '+91 98765 43213',
       'role': 'USER',
       'status': 'INACTIVE',

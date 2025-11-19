@@ -127,8 +127,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           ),
                         ),
                         SizedBox(height: 32),
-
-                        // Name Field
                         CustomTextField(
                           controller: _nameController,
                           labelText: 'Full Name',
@@ -137,8 +135,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           validator: Validators.validateName,
                         ),
                         SizedBox(height: 16),
-
-                        // Email Field
                         CustomTextField(
                           controller: _emailController,
                           labelText: 'Email',
@@ -148,8 +144,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           validator: Validators.validateEmail,
                         ),
                         SizedBox(height: 16),
-
-                        // ✅ PHONE FIELD - Using TextFormField directly
                         TextFormField(
                           controller: _phoneController,
                           decoration: InputDecoration(
@@ -164,8 +158,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           validator: Validators.validatePhone,
                         ),
                         SizedBox(height: 16),
-
-                        // Password Field
                         CustomTextField(
                           controller: _passwordController,
                           labelText: 'Password',
@@ -176,8 +168,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           validator: Validators.validatePassword,
                         ),
                         SizedBox(height: 16),
-
-                        // Confirm Password Field
                         CustomTextField(
                           controller: _confirmPasswordController,
                           labelText: 'Confirm Password',
@@ -188,8 +178,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           validator: _validateConfirmPassword,
                         ),
                         SizedBox(height: 16),
-
-                        // ✅ ADDRESS FIELD - Using TextFormField directly
                         TextFormField(
                           controller: _addressController,
                           decoration: InputDecoration(
@@ -203,8 +191,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           maxLines: 2,
                         ),
                         SizedBox(height: 24),
-
-                        // Register Button
                         CustomButton(
                           text: 'Register',
                           onPressed: _handleRegister,
@@ -214,8 +200,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           height: 50,
                         ),
                         SizedBox(height: 16),
-
-                        // Login Link
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [

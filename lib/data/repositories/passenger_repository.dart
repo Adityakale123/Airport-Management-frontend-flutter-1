@@ -2,7 +2,6 @@ import '../services/api_service.dart';
 import '../../core/constants/api_endpoints.dart';
 
 class PassengerRepository {
-  // Get all user passengers
   Future<List<dynamic>> getUserPassengers() async {
     try {
       final response = await ApiService.get(ApiEndpoints.userPassengers);
@@ -12,7 +11,6 @@ class PassengerRepository {
     }
   }
 
-  // Get passenger by ID
   Future<Map<String, dynamic>> getPassengerById(int id) async {
     try {
       final response = await ApiService.get(ApiEndpoints.userPassengerById(id));
@@ -22,7 +20,6 @@ class PassengerRepository {
     }
   }
 
-  // Create passenger
   Future<Map<String, dynamic>> createPassenger(
       Map<String, dynamic> passengerData) async {
     try {
@@ -36,7 +33,6 @@ class PassengerRepository {
     }
   }
 
-  // Update passenger
   Future<Map<String, dynamic>> updatePassenger(
       int id, Map<String, dynamic> passengerData) async {
     try {
@@ -50,7 +46,6 @@ class PassengerRepository {
     }
   }
 
-  // Delete passenger
   Future<void> deletePassenger(int id) async {
     try {
       await ApiService.delete(ApiEndpoints.userPassengerById(id));

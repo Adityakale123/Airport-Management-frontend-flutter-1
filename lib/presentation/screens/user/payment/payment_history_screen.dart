@@ -46,7 +46,6 @@ class _PaymentHistoryScreenState extends State<PaymentHistoryScreen> {
             return LoadingIndicator(message: 'Loading payment history...');
           }
 
-          // Get bookings with COMPLETED payment status or non-PENDING status
           final payments = provider.bookings
               .where((b) =>
                   b.paymentStatus == 'COMPLETED' ||

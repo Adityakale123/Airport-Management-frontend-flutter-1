@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../../../core/constants/app_colors.dart';
+import '../../../../core/routes/app_routes.dart';
+import '../../../providers/terminal_provider.dart';
+import '../../../widgets/common/loading_indicator.dart';
 import '../../../widgets/common/search_bar.dart';
 import '../../../widgets/common/empty_state.dart';
 
@@ -12,104 +16,103 @@ class TerminalsManagementScreen extends StatefulWidget {
 class _TerminalsManagementScreenState extends State<TerminalsManagementScreen> {
   String _searchQuery = '';
 
-  // Mock data
-  final List<Map<String, dynamic>> _mockTerminals = [
-    {
-      'id': 1,
-      'name': 'Terminal 1',
-      'gateNo': 'T1',
-      'status': 'OPERATIONAL',
-      'capacity': 50,
-      'gates': ['T1-G1', 'T1-G2', 'T1-G3', 'T1-G4', 'T1-G5'],
-      'currentFlights': 12,
-    },
-    {
-      'id': 2,
-      'name': 'Terminal 2',
-      'gateNo': 'T2',
-      'status': 'OPERATIONAL',
-      'capacity': 75,
-      'gates': ['T2-G1', 'T2-G2', 'T2-G3', 'T2-G4', 'T2-G5', 'T2-G6', 'T2-G7'],
-      'currentFlights': 18,
-    },
-    {
-      'id': 3,
-      'name': 'Terminal 3',
-      'gateNo': 'T3',
-      'status': 'MAINTENANCE',
-      'capacity': 100,
-      'gates': [
-        'T3-G1',
-        'T3-G2',
-        'T3-G3',
-        'T3-G4',
-        'T3-G5',
-        'T3-G6',
-        'T3-G7',
-        'T3-G8',
-        'T3-G9',
-        'T3-G10'
-      ],
-      'currentFlights': 0,
-    },
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _loadTerminals();
+  }
+
+  Future<void> _loadTerminals() async {
+    await Provider.of<TerminalProvider>(context, listen: false)
+        .getAllTerminals();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final filteredTerminals = _mockTerminals.where((terminal) {
-      return terminal['name']
-          .toString()
-          .toLowerCase()
-          .contains(_searchQuery.toLowerCase());
-    }).toList();
-
     return Scaffold(
       appBar: AppBar(
         title: Text('Terminals Management'),
         actions: [
           IconButton(
             icon: Icon(Icons.refresh),
-            onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Refreshing terminal data...')),
-              );
-            },
+            onPressed: _loadTerminals,
           ),
         ],
       ),
-      body: Column(
-        children: [
-          CustomSearchBar(
-            hintText: 'Search terminals...',
-            onChanged: (value) {
-              setState(() => _searchQuery = value);
-            },
-          ),
-          Expanded(
-            child: filteredTerminals.isEmpty
-                ? EmptyState(
-                    icon: Icons.business,
-                    title: 'No Terminals Found',
-                    subtitle: _searchQuery.isEmpty
-                        ? 'No terminals available'
-                        : 'No terminals match your search',
-                  )
-                : ListView.builder(
-                    padding: EdgeInsets.all(16),
-                    itemCount: filteredTerminals.length,
-                    itemBuilder: (context, index) {
-                      final terminal = filteredTerminals[index];
-                      return _buildTerminalCard(terminal);
-                    },
+      body: Consumer<TerminalProvider>(
+        builder: (context, provider, child) {
+          if (provider.isLoading) {
+            return LoadingIndicator(message: 'Loading terminals...');
+          }
+
+          if (provider.errorMessage != null) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.error_outline, size: 64, color: AppColors.error),
+                  SizedBox(height: 16),
+                  Text(provider.errorMessage!),
+                  SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: _loadTerminals,
+                    child: Text('Retry'),
                   ),
-          ),
-        ],
+                ],
+              ),
+            );
+          }
+
+          final filteredTerminals = provider.terminals.where((terminal) {
+            return terminal.name
+                    .toLowerCase()
+                    .contains(_searchQuery.toLowerCase()) ||
+                terminal.code
+                    .toLowerCase()
+                    .contains(_searchQuery.toLowerCase());
+          }).toList();
+
+          return Column(
+            children: [
+              CustomSearchBar(
+                hintText: 'Search terminals...',
+                onChanged: (value) {
+                  setState(() => _searchQuery = value);
+                },
+              ),
+              Expanded(
+                child: filteredTerminals.isEmpty
+                    ? EmptyState(
+                        icon: Icons.business,
+                        title: 'No Terminals Found',
+                        subtitle: _searchQuery.isEmpty
+                            ? 'Add your first terminal to get started'
+                            : 'No terminals match your search',
+                        actionText: 'Add Terminal',
+                        onActionPressed: () {
+                          Navigator.pushNamed(
+                              context, AppRoutes.adminAddTerminal);
+                        },
+                      )
+                    : RefreshIndicator(
+                        onRefresh: _loadTerminals,
+                        child: ListView.builder(
+                          padding: EdgeInsets.all(16),
+                          itemCount: filteredTerminals.length,
+                          itemBuilder: (context, index) {
+                            final terminal = filteredTerminals[index];
+                            return _buildTerminalCard(terminal);
+                          },
+                        ),
+                      ),
+              ),
+            ],
+          );
+        },
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Add terminal functionality')),
-          );
+          Navigator.pushNamed(context, AppRoutes.adminAddTerminal);
         },
         icon: Icon(Icons.add),
         label: Text('Add Terminal'),
@@ -117,8 +120,8 @@ class _TerminalsManagementScreenState extends State<TerminalsManagementScreen> {
     );
   }
 
-  Widget _buildTerminalCard(Map<String, dynamic> terminal) {
-    final isOperational = terminal['status'] == 'OPERATIONAL';
+  Widget _buildTerminalCard(terminal) {
+    final isOperational = terminal.status == 'OPERATIONAL';
     final Color statusColor =
         isOperational ? AppColors.success : AppColors.warning;
 
@@ -152,7 +155,7 @@ class _TerminalsManagementScreenState extends State<TerminalsManagementScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            terminal['name'],
+                            terminal.name,
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
@@ -160,7 +163,7 @@ class _TerminalsManagementScreenState extends State<TerminalsManagementScreen> {
                           ),
                           SizedBox(height: 4),
                           Text(
-                            '${terminal['gates'].length} Gates',
+                            terminal.code,
                             style: TextStyle(
                               fontSize: 14,
                               color: AppColors.textSecondary,
@@ -177,7 +180,7 @@ class _TerminalsManagementScreenState extends State<TerminalsManagementScreen> {
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
-                      terminal['status'],
+                      terminal.status,
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
@@ -193,51 +196,19 @@ class _TerminalsManagementScreenState extends State<TerminalsManagementScreen> {
                   Expanded(
                     child: _buildInfoTile(
                       'Capacity',
-                      '${terminal['capacity']} flights',
+                      '${terminal.capacity} flights',
                       Icons.event_seat,
                     ),
                   ),
-                  Container(width: 1, height: 40, color: AppColors.greyLight),
-                  Expanded(
-                    child: _buildInfoTile(
-                      'Current',
-                      '${terminal['currentFlights']} flights',
-                      Icons.flight,
+                  if (terminal.facilities != null &&
+                      terminal.facilities!.isNotEmpty)
+                    Expanded(
+                      child: _buildInfoTile(
+                        'Facilities',
+                        'Available',
+                        Icons.check_circle,
+                      ),
                     ),
-                  ),
-                  Container(width: 1, height: 40, color: AppColors.greyLight),
-                  Expanded(
-                    child: _buildInfoTile(
-                      'Available',
-                      '${terminal['capacity'] - terminal['currentFlights']}',
-                      Icons.check_circle,
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 12),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  TextButton.icon(
-                    onPressed: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('View gates')),
-                      );
-                    },
-                    icon: Icon(Icons.meeting_room, size: 18),
-                    label: Text('View Gates'),
-                  ),
-                  SizedBox(width: 8),
-                  TextButton.icon(
-                    onPressed: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Edit terminal')),
-                      );
-                    },
-                    icon: Icon(Icons.edit, size: 18),
-                    label: Text('Edit'),
-                  ),
                 ],
               ),
             ],
@@ -276,7 +247,7 @@ class _TerminalsManagementScreenState extends State<TerminalsManagementScreen> {
     );
   }
 
-  void _showTerminalDetails(Map<String, dynamic> terminal) {
+  void _showTerminalDetails(terminal) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -284,9 +255,9 @@ class _TerminalsManagementScreenState extends State<TerminalsManagementScreen> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (context) => DraggableScrollableSheet(
-        initialChildSize: 0.7,
-        minChildSize: 0.5,
-        maxChildSize: 0.95,
+        initialChildSize: 0.6,
+        minChildSize: 0.4,
+        maxChildSize: 0.9,
         expand: false,
         builder: (context, scrollController) => Container(
           padding: EdgeInsets.all(24),
@@ -297,7 +268,7 @@ class _TerminalsManagementScreenState extends State<TerminalsManagementScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    terminal['name'],
+                    terminal.name,
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
@@ -310,41 +281,85 @@ class _TerminalsManagementScreenState extends State<TerminalsManagementScreen> {
                 ],
               ),
               SizedBox(height: 24),
-              _buildDetailRow('Gate Number', terminal['gateNo']),
-              _buildDetailRow('Status', terminal['status']),
-              _buildDetailRow('Capacity', '${terminal['capacity']} flights'),
-              _buildDetailRow(
-                'Current Flights',
-                '${terminal['currentFlights']}',
-              ),
+              _buildDetailRow('Terminal Code', terminal.code),
+              _buildDetailRow('Status', terminal.status),
+              _buildDetailRow('Capacity', '${terminal.capacity} flights'),
+              if (terminal.facilities != null &&
+                  terminal.facilities!.isNotEmpty)
+                _buildDetailRow('Facilities', terminal.facilities!),
               SizedBox(height: 24),
-              Text(
-                'Available Gates',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              SizedBox(height: 12),
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: (terminal['gates'] as List<String>).map((gate) {
-                  return Chip(
-                    label: Text(gate),
-                    backgroundColor: AppColors.primary.withOpacity(0.1),
-                  );
-                }).toList(),
-              ),
-              SizedBox(height: 24),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Manage gates')),
-                  );
-                },
-                child: Text('Manage Gates'),
+              Row(
+                children: [
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        // TODO: Navigate to edit screen
+                      },
+                      icon: Icon(Icons.edit),
+                      label: Text('Edit'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 12),
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: () async {
+                        final confirmed = await showDialog<bool>(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            title: Text('Delete Terminal'),
+                            content: Text(
+                                'Are you sure you want to delete this terminal?'),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(context, false),
+                                child: Text('Cancel'),
+                              ),
+                              TextButton(
+                                onPressed: () => Navigator.pop(context, true),
+                                style: TextButton.styleFrom(
+                                  foregroundColor: AppColors.error,
+                                ),
+                                child: Text('Delete'),
+                              ),
+                            ],
+                          ),
+                        );
+
+                        if (confirmed == true) {
+                          final success = await Provider.of<TerminalProvider>(
+                            context,
+                            listen: false,
+                          ).deleteTerminal(terminal.id!);
+
+                          if (mounted) {
+                            Navigator.pop(context);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  success
+                                      ? 'Terminal deleted successfully'
+                                      : 'Failed to delete terminal',
+                                ),
+                                backgroundColor: success
+                                    ? AppColors.success
+                                    : AppColors.error,
+                              ),
+                            );
+                          }
+                        }
+                      },
+                      icon: Icon(Icons.delete),
+                      label: Text('Delete'),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: AppColors.error,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
@@ -366,11 +381,14 @@ class _TerminalsManagementScreenState extends State<TerminalsManagementScreen> {
               color: AppColors.textSecondary,
             ),
           ),
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
+          Flexible(
+            child: Text(
+              value,
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+              ),
+              textAlign: TextAlign.right,
             ),
           ),
         ],

@@ -33,7 +33,6 @@ class FlightProvider with ChangeNotifier {
     }
   }
 
-  // Get flight by ID (User - for viewing details after search)
   Future<void> getUserFlightById(int id) async {
     _isLoading = true;
     _errorMessage = null;
@@ -49,7 +48,6 @@ class FlightProvider with ChangeNotifier {
     }
   }
 
-  // Get flight by ID (Admin)
   Future<void> getAdminFlightById(int id) async {
     _isLoading = true;
     _errorMessage = null;

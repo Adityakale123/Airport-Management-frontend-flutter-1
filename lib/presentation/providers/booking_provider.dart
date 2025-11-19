@@ -142,15 +142,10 @@ class BookingProvider with ChangeNotifier {
     }
   }
 
-  // Add this property at the top with other properties
   List<Booking>? _flightBookings;
 
-// Add this getter with other getters
   List<Booking>? get flightBookings => _flightBookings;
 
-// Add these methods at the end before the closing brace
-
-// Get bookings by flight ID
   Future<void> getBookingsByFlight(int flightId) async {
     _isLoading = true;
     _errorMessage = null;

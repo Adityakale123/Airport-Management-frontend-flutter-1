@@ -43,12 +43,14 @@ dependencies:
   qr_flutter: ^4.1.0
   qr_code_scanner: ^1.0.1
 
+
   # Charts
   fl_chart: ^0.65.0
   syncfusion_flutter_charts: ^24.1.41
 
   # Notifications
-  flutter_local_notifications: ^16.3.0
+  flutter_local_notifications: ^17.1.2
+
 
   # Image Picker
   image_picker: ^1.0.5
@@ -56,7 +58,8 @@ dependencies:
   # Utilities
   uuid: ^4.2.2
   url_launcher: ^6.2.2
-  file_picker: ^6.0.0
+  file_picker: ^8.0.0
+
   
 
 dev_dependencies:

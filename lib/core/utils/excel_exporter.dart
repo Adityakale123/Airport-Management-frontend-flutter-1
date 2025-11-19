@@ -6,7 +6,6 @@ import '../../data/models/flight.dart';
 import '../../data/models/payment.dart';
 
 class ExcelExporter {
-  // Export Bookings to Excel
   static Future<File> exportBookings(List<Booking> bookings) async {
     final excel = Excel.createExcel();
     final sheet = excel['Bookings'];
@@ -72,16 +71,16 @@ class ExcelExporter {
     for (var flight in flights) {
       sheet.appendRow([
         TextCellValue(flight.id.toString()),
-        TextCellValue(flight.flightNumber), // ✅ UPDATED
-        TextCellValue(flight.aircraftModel ?? 'N/A'), // ✅ UPDATED
-        TextCellValue(flight.origin), // ✅ UPDATED
+        TextCellValue(flight.flightNumber),
+        TextCellValue(flight.aircraftModel ?? 'N/A'),
+        TextCellValue(flight.origin),
         TextCellValue(flight.destination),
         TextCellValue(flight.departureTime.toString()),
         TextCellValue(flight.arrivalTime.toString()),
         TextCellValue(flight.status),
-        TextCellValue(flight.economyPrice.toString()), // ✅ UPDATED
-        TextCellValue(flight.businessPrice.toString()), // ✅ ADDED
-        TextCellValue(flight.firstClassPrice.toString()), // ✅ ADDED
+        TextCellValue(flight.economyPrice.toString()),
+        TextCellValue(flight.businessPrice.toString()),
+        TextCellValue(flight.firstClassPrice.toString()),
         TextCellValue(flight.availableSeats.toString()),
       ]);
     }

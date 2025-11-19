@@ -37,7 +37,6 @@ class PaymentRepository {
     }
   }
 
-  // Razorpay: Create order for booking
   Future<CreateOrderResponseDTO> createOrderForBooking(int bookingId) async {
     try {
       final response = await ApiService.post(
@@ -50,7 +49,6 @@ class PaymentRepository {
     }
   }
 
-  // Razorpay: Verify payment and confirm booking
   Future<void> verifyPayment(PaymentVerificationDTO verificationData) async {
     try {
       await ApiService.post(
@@ -62,4 +60,3 @@ class PaymentRepository {
     }
   }
 }
-
