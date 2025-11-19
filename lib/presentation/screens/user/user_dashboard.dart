@@ -211,42 +211,7 @@ class _HomeTab extends StatelessWidget {
     );
   }
 
-  // Widget _buildQuickActions(BuildContext context) {
-  //   return GridView.count(
-  //     shrinkWrap: true,
-  //     physics: NeverScrollableScrollPhysics(),
-  //     crossAxisCount: 2,
-  //     crossAxisSpacing: 16,
-  //     mainAxisSpacing: 16,
-  //     childAspectRatio: 1.3,
-  //     children: [
-  //       _buildActionCard(
-  //         'Search Flights',
-  //         Icons.search,
-  //         AppColors.primary,
-  //         () => Navigator.pushNamed(context, AppRoutes.flightSearch),
-  //       ),
-  //       _buildActionCard(
-  //         'My Bookings',
-  //         Icons.confirmation_number,
-  //         AppColors.secondary,
-  //         () => Navigator.pushNamed(context, AppRoutes.userBookings),
-  //       ),
-  //       _buildActionCard(
-  //         'Flight Schedule',
-  //         Icons.schedule,
-  //         AppColors.warning,
-  //         () => Navigator.pushNamed(context, AppRoutes.flightSearch),
-  //       ),
-  //       _buildActionCard(
-  //         'Payment History',
-  //         Icons.payment,
-  //         AppColors.accent,
-  //         () => Navigator.pushNamed(context, AppRoutes.paymentHistory),
-  //       ),
-  //     ],
-  //   );
-  // }
+
 
   Widget _buildQuickActions(BuildContext context) {
     return SizedBox(
@@ -288,6 +253,7 @@ class _HomeTab extends StatelessWidget {
     );
   }
 
+
   Widget _buildActionCard(
       String title, IconData icon, Color color, VoidCallback onTap) {
     return Card(
@@ -297,25 +263,30 @@ class _HomeTab extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(12),
         child: Padding(
-          padding: EdgeInsets.all(16),
+          padding: EdgeInsets.all(12), // Reduced from 16
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min, // Add this
             children: [
               Container(
-                padding: EdgeInsets.all(12),
+                padding: EdgeInsets.all(10), // Reduced from 12
                 decoration: BoxDecoration(
                   color: color.withOpacity(0.2),
                   shape: BoxShape.circle,
                 ),
-                child: Icon(icon, color: color, size: 32),
+                child: Icon(icon, color: color, size: 28), // Reduced from 32
               ),
-              SizedBox(height: 12),
-              Text(
-                title,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
+              SizedBox(height: 8), // Reduced from 12
+              Flexible( // Wrap Text with Flexible
+                child: Text(
+                  title,
+                  textAlign: TextAlign.center,
+                  maxLines: 2, // Limit to 2 lines
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 13, // Reduced from 14
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
             ],
@@ -330,14 +301,15 @@ class _HomeTab extends StatelessWidget {
       builder: (context, provider, child) {
         final upcomingBookings = provider.bookings
             .where((b) =>
-                b.status == 'PENDING' ||
-                b.status == 'CONFIRMED' ||
-                b.status == 'CHECKED_IN')
+        b.status == 'PENDING' ||
+            b.status == 'CONFIRMED' ||
+            b.status == 'CHECKED_IN')
             .take(3)
             .toList();
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min, // Add this line
           children: [
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
